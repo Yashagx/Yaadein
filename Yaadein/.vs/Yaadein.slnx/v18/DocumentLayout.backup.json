@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\yaadein\\services\\groqservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:services\\groqservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\yaadein\\routinesform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:routinesform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\maindashboard.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:maindashboard.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "RoutinesForm.cs",
+              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\RoutinesForm.cs",
+              "RelativeDocumentMoniker": "RoutinesForm.cs",
+              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\RoutinesForm.cs*",
+              "RelativeToolTip": "RoutinesForm.cs*",
+              "ViewState": "AgIAAH8BAAAAAAAAAAAcwL0BAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-01T15:39:50.667Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "GroqService.cs",
+              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\Services\\GroqService.cs",
+              "RelativeDocumentMoniker": "Services\\GroqService.cs",
+              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\Services\\GroqService.cs",
+              "RelativeToolTip": "Services\\GroqService.cs",
+              "ViewState": "AgIAAGIAAAAAAAAAAAAwwIMAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-01T15:38:47.297Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MainDashboard.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\MainDashboard.Designer.cs",
+              "RelativeDocumentMoniker": "MainDashboard.Designer.cs",
+              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\MainDashboard.Designer.cs",
+              "RelativeToolTip": "MainDashboard.Designer.cs",
+              "ViewState": "AgIAAAkBAAAAAAAAAAAwwEYBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-01T14:52:23.847Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
