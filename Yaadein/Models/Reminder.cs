@@ -10,30 +10,28 @@ namespace Yaadein.Models
         public DateTime ReminderTime { get; set; }
         public bool IsRecurring { get; set; }
         public RecurrenceType Recurrence { get; set; }
-        public string Category { get; set; }
-        public string Priority { get; set; }
         public bool IsActive { get; set; }
         public bool IsCompleted { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string Category { get; set; }
+        public int Priority { get; set; }
+
+        public Reminder()
+        {
+            CreatedDate = DateTime.Now;
+            IsActive = true;
+            IsCompleted = false;
+            Priority = 2; // Medium priority
+            Recurrence = RecurrenceType.None;
+        }
     }
 
     public enum RecurrenceType
     {
-        None,
-        Daily,
-        Weekly,
-        Monthly
-    }
-
-    public static class ReminderPriorities
-    {
-        public const string High = "1";
-        public const string Medium = "2";
-        public const string Low = "3";
-
-        public static string[] GetAll()
-        {
-            return new string[] { High, Medium, Low };
-        }
+        None = 0,
+        Daily = 1,
+        Weekly = 2,
+        Monthly = 3
     }
 
     public static class ReminderCategories

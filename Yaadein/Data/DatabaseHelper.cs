@@ -1,394 +1,411 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using Yaadein.Models;
 
 namespace Yaadein.Data
 {
-    /// <summary>
-    /// Database helper for managing Yaadein data persistence using SQL Server LocalDB
-    /// </summary>
     public class DatabaseHelper
     {
-        private string connectionString;
-        private string databasePath;
+        // Set database path to your project's Data folder
+        private static string dbPath = @"C:\Users\Win11\OneDrive\Desktop\Yaadein\Data\yaadein.db";
+        private static string connectionString = $"Data Source={dbPath};Version=3;";
+        public static int CurrentUserId { get; set; }
+        public static string CurrentUserName { get; set; }
 
-        public DatabaseHelper()
-        {
-            // Set database path to AppData folder
-            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string yaaadeinFolder = Path.Combine(appDataPath, "Yaadein");
-
-            // Create folder if it doesn't exist
-            if (!Directory.Exists(yaaadeinFolder))
-            {
-                Directory.CreateDirectory(yaaadeinFolder);
-            }
-
-            databasePath = Path.Combine(yaaadeinFolder, "YaadeinData.mdf");
-
-            // Connection string for SQL Server LocalDB
-            connectionString = $@"Data Source=(LocalDB)\MSSQLLocalDB;
-                                 AttachDbFilename={databasePath};
-                                 Integrated Security=True;
-                                 Connect Timeout=30";
-
-            InitializeDatabase();
-        }
-
-        /// <summary>
-        /// Initialize database and create tables if they don't exist
-        /// </summary>
-        private void InitializeDatabase()
+        public static void InitializeDatabase()
         {
             try
             {
-                // Check if database file exists
-                if (!File.Exists(databasePath))
+                string directory = Path.GetDirectoryName(dbPath);
+
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                bool needsCreation = !File.Exists(dbPath);
+
+                if (needsCreation)
                 {
                     CreateDatabase();
                 }
+                else
+                {
+                    // Database file exists, but verify it has tables
+                    if (!VerifyDatabase())
+                    {
+                        // Delete corrupt database and recreate
+                        File.Delete(dbPath);
+                        CreateDatabase();
+                    }
+                }
 
-                CreateTables();
+                // Final verification
+                if (!VerifyDatabase())
+                {
+                    throw new Exception("Database verification failed after creation.");
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to initialize database: {ex.Message}", ex);
+                System.Windows.Forms.MessageBox.Show(
+                    $"Database initialization failed:\n\n{ex.Message}\n\nPath: {dbPath}\n\nStack Trace:\n{ex.StackTrace}",
+                    "Database Error",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Error);
+                throw;
             }
         }
 
-        /// <summary>
-        /// Create the database file
-        /// </summary>
-        private void CreateDatabase()
+        private static bool VerifyDatabase()
         {
-            string masterConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;
-                                             Initial Catalog=master;
-                                             Integrated Security=True";
-
-            string createDbQuery = $@"CREATE DATABASE YaadeinData ON PRIMARY 
-                                     (NAME = YaadeinData, 
-                                      FILENAME = '{databasePath}')";
-
-            using (SqlConnection connection = new SqlConnection(masterConnectionString))
+            try
             {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(createDbQuery, connection))
+                if (!File.Exists(dbPath))
                 {
-                    command.ExecuteNonQuery();
+                    return false;
                 }
-            }
-        }
 
-        /// <summary>
-        /// Create all necessary tables
-        /// </summary>
-        private void CreateTables()
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-
-                // Create People table
-                string createPeopleTable = @"
-                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'People')
-                    CREATE TABLE People (
-                        Id INT PRIMARY KEY IDENTITY(1,1),
-                        Name NVARCHAR(200) NOT NULL,
-                        Relationship NVARCHAR(100),
-                        PhoneNumber NVARCHAR(50),
-                        Email NVARCHAR(200),
-                        Address NVARCHAR(500),
-                        Notes NVARCHAR(MAX),
-                        PhotoPath NVARCHAR(500),
-                        Birthday DATE,
-                        FavoriteMemory NVARCHAR(MAX),
-                        ImportantDetails NVARCHAR(MAX),
-                        CreatedDate DATETIME DEFAULT GETDATE(),
-                        LastContactDate DATETIME,
-                        IsFavorite BIT DEFAULT 0,
-                        EmergencyContact NVARCHAR(10)
-                    )";
-
-                // Create Reminders table
-                string createRemindersTable = @"
-                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Reminders')
-                    CREATE TABLE Reminders (
-                        Id INT PRIMARY KEY IDENTITY(1,1),
-                        Title NVARCHAR(200) NOT NULL,
-                        Description NVARCHAR(MAX),
-                        ReminderTime DATETIME NOT NULL,
-                        IsRecurring BIT DEFAULT 0,
-                        Recurrence INT DEFAULT 0,
-                        IsActive BIT DEFAULT 1,
-                        IsCompleted BIT DEFAULT 0,
-                        CreatedDate DATETIME DEFAULT GETDATE(),
-                        Category NVARCHAR(100),
-                        Priority INT DEFAULT 2
-                    )";
-
-                // Create Routines table
-                string createRoutinesTable = @"
-                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Routines')
-                    CREATE TABLE Routines (
-                        Id INT PRIMARY KEY IDENTITY(1,1),
-                        Name NVARCHAR(200) NOT NULL,
-                        Description NVARCHAR(MAX),
-                        StartTime TIME NOT NULL,
-                        IsActive BIT DEFAULT 1,
-                        Category NVARCHAR(100),
-                        CreatedDate DATETIME DEFAULT GETDATE(),
-                        IconName NVARCHAR(50)
-                    )";
-
-                // Create RoutineSteps table
-                string createRoutineStepsTable = @"
-                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'RoutineSteps')
-                    CREATE TABLE RoutineSteps (
-                        Id INT PRIMARY KEY IDENTITY(1,1),
-                        RoutineId INT NOT NULL,
-                        StepNumber INT NOT NULL,
-                        Instruction NVARCHAR(500) NOT NULL,
-                        DurationMinutes INT DEFAULT 5,
-                        IsCompleted BIT DEFAULT 0,
-                        ImagePath NVARCHAR(500),
-                        FOREIGN KEY (RoutineId) REFERENCES Routines(Id) ON DELETE CASCADE
-                    )";
-
-                // Create MemoryCards table
-                string createMemoryCardsTable = @"
-                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'MemoryCards')
-                    CREATE TABLE MemoryCards (
-                        Id INT PRIMARY KEY IDENTITY(1,1),
-                        Title NVARCHAR(200) NOT NULL,
-                        Content NVARCHAR(MAX),
-                        Category NVARCHAR(100),
-                        Icon NVARCHAR(10),
-                        ImagePath NVARCHAR(500),
-                        CreatedDate DATETIME DEFAULT GETDATE()
-                    )";
-
-                // Execute table creation commands
-                ExecuteNonQuery(createPeopleTable, connection);
-                ExecuteNonQuery(createRemindersTable, connection);
-                ExecuteNonQuery(createRoutinesTable, connection);
-                ExecuteNonQuery(createRoutineStepsTable, connection);
-                ExecuteNonQuery(createMemoryCardsTable, connection);
-            }
-        }
-
-        private void ExecuteNonQuery(string query, SqlConnection connection)
-        {
-            using (SqlCommand command = new SqlCommand(query, connection))
-            {
-                command.ExecuteNonQuery();
-            }
-        }
-
-        #region People Operations
-
-        public int AddPerson(Person person)
-        {
-            string query = @"INSERT INTO People 
-                           (Name, Relationship, PhoneNumber, Email, Address, Notes, 
-                            PhotoPath, Birthday, FavoriteMemory, ImportantDetails, 
-                            CreatedDate, LastContactDate, IsFavorite, EmergencyContact)
-                           VALUES 
-                           (@Name, @Relationship, @PhoneNumber, @Email, @Address, @Notes,
-                            @PhotoPath, @Birthday, @FavoriteMemory, @ImportantDetails,
-                            @CreatedDate, @LastContactDate, @IsFavorite, @EmergencyContact);
-                           SELECT CAST(SCOPE_IDENTITY() AS INT)";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
+                using (var conn = GetConnection())
                 {
-                    AddPersonParameters(command, person);
-                    return (int)command.ExecuteScalar();
-                }
-            }
-        }
-
-        public void UpdatePerson(Person person)
-        {
-            string query = @"UPDATE People SET 
-                           Name = @Name, Relationship = @Relationship, 
-                           PhoneNumber = @PhoneNumber, Email = @Email, 
-                           Address = @Address, Notes = @Notes, 
-                           PhotoPath = @PhotoPath, Birthday = @Birthday, 
-                           FavoriteMemory = @FavoriteMemory, 
-                           ImportantDetails = @ImportantDetails,
-                           LastContactDate = @LastContactDate, 
-                           IsFavorite = @IsFavorite, 
-                           EmergencyContact = @EmergencyContact
-                           WHERE Id = @Id";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Id", person.Id);
-                    AddPersonParameters(command, person);
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
-
-        public void DeletePerson(int id)
-        {
-            string query = "DELETE FROM People WHERE Id = @Id";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Id", id);
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
-
-        public List<Person> GetAllPeople()
-        {
-            List<Person> people = new List<Person>();
-            string query = "SELECT * FROM People ORDER BY Name";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
+                    conn.Open();
+                    string query = "SELECT name FROM sqlite_master WHERE type='table' AND name='Users'";
+                    using (var cmd = new SQLiteCommand(query, conn))
                     {
-                        people.Add(ReadPerson(reader));
+                        var result = cmd.ExecuteScalar();
+                        return result != null;
                     }
                 }
             }
-
-            return people;
-        }
-
-        private void AddPersonParameters(SqlCommand command, Person person)
-        {
-            command.Parameters.AddWithValue("@Name", person.Name ?? "");
-            command.Parameters.AddWithValue("@Relationship", person.Relationship ?? "");
-            command.Parameters.AddWithValue("@PhoneNumber", person.PhoneNumber ?? "");
-            command.Parameters.AddWithValue("@Email", person.Email ?? "");
-            command.Parameters.AddWithValue("@Address", person.Address ?? "");
-            command.Parameters.AddWithValue("@Notes", person.Notes ?? "");
-            command.Parameters.AddWithValue("@PhotoPath", person.PhotoPath ?? "");
-            command.Parameters.AddWithValue("@Birthday", (object)person.Birthday ?? DBNull.Value);
-            command.Parameters.AddWithValue("@FavoriteMemory", person.FavoriteMemory ?? "");
-            command.Parameters.AddWithValue("@ImportantDetails", person.ImportantDetails ?? "");
-            command.Parameters.AddWithValue("@CreatedDate", person.CreatedDate);
-            command.Parameters.AddWithValue("@LastContactDate", person.LastContactDate);
-            command.Parameters.AddWithValue("@IsFavorite", person.IsFavorite);
-            command.Parameters.AddWithValue("@EmergencyContact", person.EmergencyContact ?? "No");
-        }
-
-        private Person ReadPerson(SqlDataReader reader)
-        {
-            return new Person
+            catch
             {
-                Id = reader.GetInt32(0),
-                Name = reader.GetString(1),
-                Relationship = reader.IsDBNull(2) ? "" : reader.GetString(2),
-                PhoneNumber = reader.IsDBNull(3) ? "" : reader.GetString(3),
-                Email = reader.IsDBNull(4) ? "" : reader.GetString(4),
-                Address = reader.IsDBNull(5) ? "" : reader.GetString(5),
-                Notes = reader.IsDBNull(6) ? "" : reader.GetString(6),
-                PhotoPath = reader.IsDBNull(7) ? "" : reader.GetString(7),
-                Birthday = reader.IsDBNull(8) ? (DateTime?)null : reader.GetDateTime(8),
-                FavoriteMemory = reader.IsDBNull(9) ? "" : reader.GetString(9),
-                ImportantDetails = reader.IsDBNull(10) ? "" : reader.GetString(10),
-                CreatedDate = reader.GetDateTime(11),
-                LastContactDate = reader.GetDateTime(12),
-                IsFavorite = reader.GetBoolean(13),
-                EmergencyContact = reader.IsDBNull(14) ? "No" : reader.GetString(14)
-            };
+                return false;
+            }
         }
 
-        #endregion
-
-        #region Reminder Operations
-
-        public int AddReminder(Reminder reminder)
+        private static void CreateDatabase()
         {
-            string query = @"INSERT INTO Reminders 
-                           (Title, Description, ReminderTime, IsRecurring, Recurrence,
-                            IsActive, IsCompleted, CreatedDate, Category, Priority)
-                           VALUES 
-                           (@Title, @Description, @ReminderTime, @IsRecurring, @Recurrence,
-                            @IsActive, @IsCompleted, @CreatedDate, @Category, @Priority);
-                           SELECT CAST(SCOPE_IDENTITY() AS INT)";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            try
             {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
+                // Create the database file
+                SQLiteConnection.CreateFile(dbPath);
+
+                using (var conn = new SQLiteConnection(connectionString))
                 {
-                    AddReminderParameters(command, reminder);
-                    return (int)command.ExecuteScalar();
+                    conn.Open();
+
+                    // Create tables one by one with error handling
+                    CreateTable(conn, "Users", @"CREATE TABLE IF NOT EXISTS Users (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Username TEXT UNIQUE NOT NULL,
+                        PasswordHash TEXT NOT NULL,
+                        FullName TEXT NOT NULL,
+                        Email TEXT,
+                        PhoneNumber TEXT,
+                        DateOfBirth TEXT,
+                        ProfilePhoto TEXT,
+                        IsPatient INTEGER DEFAULT 1,
+                        CaregiverUserId INTEGER,
+                        CreatedDate TEXT DEFAULT CURRENT_TIMESTAMP,
+                        LastLoginDate TEXT
+                    )");
+
+                    CreateTable(conn, "Reminders", @"CREATE TABLE IF NOT EXISTS Reminders (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        UserId INTEGER NOT NULL,
+                        Title TEXT NOT NULL,
+                        Description TEXT,
+                        ReminderTime TEXT NOT NULL,
+                        IsRecurring INTEGER,
+                        Recurrence TEXT,
+                        Category TEXT,
+                        Priority INTEGER,
+                        IsActive INTEGER,
+                        IsCompleted INTEGER,
+                        CreatedDate TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(UserId) REFERENCES Users(Id)
+                    )");
+
+                    CreateTable(conn, "People", @"CREATE TABLE IF NOT EXISTS People (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        UserId INTEGER NOT NULL,
+                        Name TEXT NOT NULL,
+                        Relationship TEXT,
+                        PhoneNumber TEXT,
+                        Email TEXT,
+                        Address TEXT,
+                        Birthday TEXT,
+                        FavoriteMemory TEXT,
+                        ImportantDetails TEXT,
+                        Notes TEXT,
+                        IsFavorite INTEGER,
+                        EmergencyContact TEXT,
+                        PhotoPath TEXT,
+                        CreatedDate TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(UserId) REFERENCES Users(Id)
+                    )");
+
+                    CreateTable(conn, "Routines", @"CREATE TABLE IF NOT EXISTS Routines (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        UserId INTEGER NOT NULL,
+                        Name TEXT NOT NULL,
+                        Description TEXT,
+                        StartTime TEXT,
+                        Category TEXT,
+                        IsActive INTEGER,
+                        CreatedDate TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(UserId) REFERENCES Users(Id)
+                    )");
+
+                    CreateTable(conn, "RoutineSteps", @"CREATE TABLE IF NOT EXISTS RoutineSteps (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        RoutineId INTEGER,
+                        StepNumber INTEGER,
+                        Instruction TEXT,
+                        DurationMinutes INTEGER,
+                        FOREIGN KEY(RoutineId) REFERENCES Routines(Id)
+                    )");
+
+                    CreateTable(conn, "MemoryJournal", @"CREATE TABLE IF NOT EXISTS MemoryJournal (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        UserId INTEGER NOT NULL,
+                        Title TEXT,
+                        Content TEXT,
+                        EmotionTag TEXT,
+                        EmotionIntensity INTEGER,
+                        IsVoice INTEGER,
+                        AudioPath TEXT,
+                        CreatedDate TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(UserId) REFERENCES Users(Id)
+                    )");
+
+                    CreateTable(conn, "EmotionalInsights", @"CREATE TABLE IF NOT EXISTS EmotionalInsights (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        UserId INTEGER NOT NULL,
+                        EmotionType TEXT,
+                        IntensityLevel INTEGER,
+                        TriggerContext TEXT,
+                        RecordedDate TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(UserId) REFERENCES Users(Id)
+                    )");
+
+                    CreateTable(conn, "CaregiverAlerts", @"CREATE TABLE IF NOT EXISTS CaregiverAlerts (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        PatientUserId INTEGER NOT NULL,
+                        CaregiverUserId INTEGER NOT NULL,
+                        AlertType TEXT,
+                        Message TEXT,
+                        Severity TEXT,
+                        IsRead INTEGER DEFAULT 0,
+                        CreatedDate TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(PatientUserId) REFERENCES Users(Id),
+                        FOREIGN KEY(CaregiverUserId) REFERENCES Users(Id)
+                    )");
+
+                    CreateTable(conn, "MemoryCards", @"CREATE TABLE IF NOT EXISTS MemoryCards (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        UserId INTEGER NOT NULL,
+                        Title TEXT NOT NULL,
+                        Content TEXT,
+                        Category TEXT,
+                        Icon TEXT,
+                        ImagePath TEXT,
+                        CreatedDate TEXT DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY(UserId) REFERENCES Users(Id)
+                    )");
+
+                    conn.Close();
+                }
+
+                System.Windows.Forms.MessageBox.Show(
+                    $"Database created successfully!\n\nLocation:\n{dbPath}\n\nYou can now open this file in DB Browser for SQLite.",
+                    "Database Created",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to create database: {ex.Message}", ex);
+            }
+        }
+
+        private static void CreateTable(SQLiteConnection conn, string tableName, string createSql)
+        {
+            try
+            {
+                using (var cmd = new SQLiteCommand(createSql, conn))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to create table '{tableName}': {ex.Message}", ex);
+            }
+        }
+
+        private static void ExecuteNonQuery(SQLiteConnection conn, string sql)
+        {
+            using (var cmd = new SQLiteCommand(sql, conn))
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public static SQLiteConnection GetConnection()
+        {
+            return new SQLiteConnection(connectionString);
+        }
+
+        public static string HashPassword(string password)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+
+        public static bool ValidateUser(string username, string password)
+        {
+            string hashedPassword = HashPassword(password);
+
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                string query = "SELECT Id, FullName FROM Users WHERE Username = @username AND PasswordHash = @password";
+                using (var cmd = new SQLiteCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@username", username);
+                    cmd.Parameters.AddWithValue("@password", hashedPassword);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            CurrentUserId = reader.GetInt32(0);
+                            CurrentUserName = reader.GetString(1);
+
+                            reader.Close();
+
+                            string updateLastLogin = "UPDATE Users SET LastLoginDate = @now WHERE Id = @id";
+                            using (var updateCmd = new SQLiteCommand(updateLastLogin, conn))
+                            {
+                                updateCmd.Parameters.AddWithValue("@now", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                                updateCmd.Parameters.AddWithValue("@id", CurrentUserId);
+                                updateCmd.ExecuteNonQuery();
+                            }
+
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static bool RegisterUser(string username, string password, string fullName, string email, bool isPatient)
+        {
+            string hashedPassword = HashPassword(password);
+
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                string query = @"INSERT INTO Users (Username, PasswordHash, FullName, Email, IsPatient, CreatedDate) 
+                                VALUES (@username, @password, @fullname, @email, @isPatient, @created)";
+
+                try
+                {
+                    using (var cmd = new SQLiteCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@username", username);
+                        cmd.Parameters.AddWithValue("@password", hashedPassword);
+                        cmd.Parameters.AddWithValue("@fullname", fullName);
+                        cmd.Parameters.AddWithValue("@email", email ?? "");
+                        cmd.Parameters.AddWithValue("@isPatient", isPatient ? 1 : 0);
+                        cmd.Parameters.AddWithValue("@created", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                        cmd.ExecuteNonQuery();
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Registration error: {ex.Message}");
+                    System.Windows.Forms.MessageBox.Show(
+                        $"Registration failed:\n\n{ex.Message}",
+                        "Registration Error",
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Error);
+                    return false;
                 }
             }
         }
 
-        public void UpdateReminder(Reminder reminder)
+        public static bool UsernameExists(string username)
         {
-            string query = @"UPDATE Reminders SET 
-                           Title = @Title, Description = @Description, 
-                           ReminderTime = @ReminderTime, IsRecurring = @IsRecurring,
-                           Recurrence = @Recurrence, IsActive = @IsActive, 
-                           IsCompleted = @IsCompleted, Category = @Category, 
-                           Priority = @Priority
-                           WHERE Id = @Id";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (var conn = GetConnection())
             {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
+                conn.Open();
+                string query = "SELECT COUNT(*) FROM Users WHERE Username = @username";
+                using (var cmd = new SQLiteCommand(query, conn))
                 {
-                    command.Parameters.AddWithValue("@Id", reminder.Id);
-                    AddReminderParameters(command, reminder);
-                    command.ExecuteNonQuery();
+                    cmd.Parameters.AddWithValue("@username", username);
+                    long count = (long)cmd.ExecuteScalar();
+                    return count > 0;
                 }
             }
         }
 
-        public void DeleteReminder(int id)
+        public static string GetDatabasePath()
         {
-            string query = "DELETE FROM Reminders WHERE Id = @Id";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Id", id);
-                    command.ExecuteNonQuery();
-                }
-            }
+            return dbPath;
         }
 
-        public List<Reminder> GetAllReminders()
+        // ==================== REMINDER METHODS ====================
+
+        public static List<Reminder> GetUserReminders(int userId)
         {
             List<Reminder> reminders = new List<Reminder>();
-            string query = "SELECT * FROM Reminders ORDER BY ReminderTime";
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (var conn = GetConnection())
             {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
-                using (SqlDataReader reader = command.ExecuteReader())
+                conn.Open();
+                string query = @"SELECT Id, Title, Description, ReminderTime, IsRecurring, Recurrence,
+                                Category, Priority, IsActive, IsCompleted
+                                FROM Reminders WHERE UserId = @userId";
+
+                using (var cmd = new SQLiteCommand(query, conn))
                 {
-                    while (reader.Read())
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        reminders.Add(ReadReminder(reader));
+                        while (reader.Read())
+                        {
+                            reminders.Add(new Reminder
+                            {
+                                Id = reader.GetInt32(0),
+                                Title = reader.GetString(1),
+                                Description = reader.IsDBNull(2) ? "" : reader.GetString(2),
+                                ReminderTime = DateTime.Parse(reader.GetString(3)),
+                                IsRecurring = reader.GetInt32(4) == 1,
+                                Recurrence = (RecurrenceType)Enum.Parse(typeof(RecurrenceType), reader.GetString(5)),
+                                Category = reader.IsDBNull(6) ? "" : reader.GetString(6),
+                                Priority = reader.GetInt32(7),
+                                IsActive = reader.GetInt32(8) == 1,
+                                IsCompleted = reader.GetInt32(9) == 1
+                            });
+                        }
                     }
                 }
             }
@@ -396,209 +413,263 @@ namespace Yaadein.Data
             return reminders;
         }
 
-        private void AddReminderParameters(SqlCommand command, Reminder reminder)
+        public static void SaveReminder(Reminder reminder, int userId)
         {
-            command.Parameters.AddWithValue("@Title", reminder.Title ?? "");
-            command.Parameters.AddWithValue("@Description", reminder.Description ?? "");
-            command.Parameters.AddWithValue("@ReminderTime", reminder.ReminderTime);
-            command.Parameters.AddWithValue("@IsRecurring", reminder.IsRecurring);
-            command.Parameters.AddWithValue("@Recurrence", (int)reminder.Recurrence);
-            command.Parameters.AddWithValue("@IsActive", reminder.IsActive);
-            command.Parameters.AddWithValue("@IsCompleted", reminder.IsCompleted);
-            command.Parameters.AddWithValue("@CreatedDate", reminder.CreatedDate);
-            command.Parameters.AddWithValue("@Category", reminder.Category ?? "");
-            command.Parameters.AddWithValue("@Priority", reminder.Priority);
-        }
-
-        private Reminder ReadReminder(SqlDataReader reader)
-        {
-            return new Reminder
+            using (var conn = GetConnection())
             {
-                Id = reader.GetInt32(0),
-                Title = reader.GetString(1),
-                Description = reader.IsDBNull(2) ? "" : reader.GetString(2),
-                ReminderTime = reader.GetDateTime(3),
-                IsRecurring = reader.GetBoolean(4),
-                Recurrence = (RecurrenceType)reader.GetInt32(5),
-                IsActive = reader.GetBoolean(6),
-                IsCompleted = reader.GetBoolean(7),
-                CreatedDate = reader.GetDateTime(8),
-                Category = reader.IsDBNull(9) ? "" : reader.GetString(9),
-                Priority = reader.GetInt32(10)
-            };
-        }
+                conn.Open();
 
-        #endregion
-
-        #region Routine Operations
-
-        public int AddRoutine(Routine routine)
-        {
-            string query = @"INSERT INTO Routines 
-                           (Name, Description, StartTime, IsActive, Category, CreatedDate, IconName)
-                           VALUES 
-                           (@Name, @Description, @StartTime, @IsActive, @Category, @CreatedDate, @IconName);
-                           SELECT CAST(SCOPE_IDENTITY() AS INT)";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
+                if (reminder.Id == 0)
                 {
-                    command.Parameters.AddWithValue("@Name", routine.Name ?? "");
-                    command.Parameters.AddWithValue("@Description", routine.Description ?? "");
-                    command.Parameters.AddWithValue("@StartTime", routine.StartTime);
-                    command.Parameters.AddWithValue("@IsActive", routine.IsActive);
-                    command.Parameters.AddWithValue("@Category", routine.Category ?? "");
-                    command.Parameters.AddWithValue("@CreatedDate", routine.CreatedDate);
-                    command.Parameters.AddWithValue("@IconName", routine.IconName ?? "");
+                    // Insert new reminder
+                    string insert = @"INSERT INTO Reminders (UserId, Title, Description, ReminderTime, IsRecurring,
+                                     Recurrence, Category, Priority, IsActive, IsCompleted)
+                                     VALUES (@userId, @title, @description, @reminderTime, @isRecurring,
+                                     @recurrence, @category, @priority, @isActive, @isCompleted)";
 
-                    int routineId = (int)command.ExecuteScalar();
-
-                    // Add routine steps
-                    foreach (var step in routine.Steps)
+                    using (var cmd = new SQLiteCommand(insert, conn))
                     {
-                        AddRoutineStep(routineId, step, connection);
+                        cmd.Parameters.AddWithValue("@userId", userId);
+                        cmd.Parameters.AddWithValue("@title", reminder.Title);
+                        cmd.Parameters.AddWithValue("@description", reminder.Description ?? "");
+                        cmd.Parameters.AddWithValue("@reminderTime", reminder.ReminderTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                        cmd.Parameters.AddWithValue("@isRecurring", reminder.IsRecurring ? 1 : 0);
+                        cmd.Parameters.AddWithValue("@recurrence", reminder.Recurrence.ToString());
+                        cmd.Parameters.AddWithValue("@category", reminder.Category ?? "");
+                        cmd.Parameters.AddWithValue("@priority", reminder.Priority);
+                        cmd.Parameters.AddWithValue("@isActive", reminder.IsActive ? 1 : 0);
+                        cmd.Parameters.AddWithValue("@isCompleted", reminder.IsCompleted ? 1 : 0);
+                        cmd.ExecuteNonQuery();
                     }
+                }
+                else
+                {
+                    // Update existing reminder
+                    string update = @"UPDATE Reminders
+                                     SET Title = @title, Description = @description, ReminderTime = @reminderTime,
+                                     IsRecurring = @isRecurring, Recurrence = @recurrence, Category = @category,
+                                     Priority = @priority, IsActive = @isActive, IsCompleted = @isCompleted
+                                     WHERE Id = @id AND UserId = @userId";
 
-                    return routineId;
+                    using (var cmd = new SQLiteCommand(update, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", reminder.Id);
+                        cmd.Parameters.AddWithValue("@userId", userId);
+                        cmd.Parameters.AddWithValue("@title", reminder.Title);
+                        cmd.Parameters.AddWithValue("@description", reminder.Description ?? "");
+                        cmd.Parameters.AddWithValue("@reminderTime", reminder.ReminderTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                        cmd.Parameters.AddWithValue("@isRecurring", reminder.IsRecurring ? 1 : 0);
+                        cmd.Parameters.AddWithValue("@recurrence", reminder.Recurrence.ToString());
+                        cmd.Parameters.AddWithValue("@category", reminder.Category ?? "");
+                        cmd.Parameters.AddWithValue("@priority", reminder.Priority);
+                        cmd.Parameters.AddWithValue("@isActive", reminder.IsActive ? 1 : 0);
+                        cmd.Parameters.AddWithValue("@isCompleted", reminder.IsCompleted ? 1 : 0);
+                        cmd.ExecuteNonQuery();
+                    }
                 }
             }
         }
 
-        private void AddRoutineStep(int routineId, RoutineStep step, SqlConnection connection)
+        public static void DeleteReminder(int reminderId, int userId)
         {
-            string query = @"INSERT INTO RoutineSteps 
-                           (RoutineId, StepNumber, Instruction, DurationMinutes, IsCompleted, ImagePath)
-                           VALUES 
-                           (@RoutineId, @StepNumber, @Instruction, @DurationMinutes, @IsCompleted, @ImagePath)";
-
-            using (SqlCommand command = new SqlCommand(query, connection))
+            using (var conn = GetConnection())
             {
-                command.Parameters.AddWithValue("@RoutineId", routineId);
-                command.Parameters.AddWithValue("@StepNumber", step.StepNumber);
-                command.Parameters.AddWithValue("@Instruction", step.Instruction ?? "");
-                command.Parameters.AddWithValue("@DurationMinutes", step.DurationMinutes);
-                command.Parameters.AddWithValue("@IsCompleted", step.IsCompleted);
-                command.Parameters.AddWithValue("@ImagePath", step.ImagePath ?? "");
-                command.ExecuteNonQuery();
+                conn.Open();
+                string delete = "DELETE FROM Reminders WHERE Id = @id AND UserId = @userId";
+
+                using (var cmd = new SQLiteCommand(delete, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", reminderId);
+                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
-        public void UpdateRoutine(Routine routine)
+        // ==================== PEOPLE METHODS ====================
+
+        public static List<Person> GetUserPeople(int userId)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            List<Person> people = new List<Person>();
+
+            using (var conn = GetConnection())
             {
-                connection.Open();
+                conn.Open();
+                string query = @"SELECT Id, Name, Relationship, PhoneNumber, Email, Address, Birthday,
+                                FavoriteMemory, ImportantDetails, Notes, IsFavorite, EmergencyContact
+                                FROM People WHERE UserId = @userId";
 
-                // Update routine
-                string query = @"UPDATE Routines SET 
-                               Name = @Name, Description = @Description, 
-                               StartTime = @StartTime, IsActive = @IsActive, 
-                               Category = @Category, IconName = @IconName
-                               WHERE Id = @Id";
-
-                using (SqlCommand command = new SqlCommand(query, connection))
+                using (var cmd = new SQLiteCommand(query, conn))
                 {
-                    command.Parameters.AddWithValue("@Id", routine.Id);
-                    command.Parameters.AddWithValue("@Name", routine.Name ?? "");
-                    command.Parameters.AddWithValue("@Description", routine.Description ?? "");
-                    command.Parameters.AddWithValue("@StartTime", routine.StartTime);
-                    command.Parameters.AddWithValue("@IsActive", routine.IsActive);
-                    command.Parameters.AddWithValue("@Category", routine.Category ?? "");
-                    command.Parameters.AddWithValue("@IconName", routine.IconName ?? "");
-                    command.ExecuteNonQuery();
-                }
+                    cmd.Parameters.AddWithValue("@userId", userId);
 
-                // Delete existing steps
-                string deleteSteps = "DELETE FROM RoutineSteps WHERE RoutineId = @RoutineId";
-                using (SqlCommand command = new SqlCommand(deleteSteps, connection))
-                {
-                    command.Parameters.AddWithValue("@RoutineId", routine.Id);
-                    command.ExecuteNonQuery();
-                }
-
-                // Add updated steps
-                foreach (var step in routine.Steps)
-                {
-                    AddRoutineStep(routine.Id, step, connection);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            people.Add(new Person
+                            {
+                                Id = reader.GetInt32(0),
+                                Name = reader.GetString(1),
+                                Relationship = reader.IsDBNull(2) ? "" : reader.GetString(2),
+                                PhoneNumber = reader.IsDBNull(3) ? "" : reader.GetString(3),
+                                Email = reader.IsDBNull(4) ? "" : reader.GetString(4),
+                                Address = reader.IsDBNull(5) ? "" : reader.GetString(5),
+                                Birthday = reader.IsDBNull(6) ? (DateTime?)null : DateTime.Parse(reader.GetString(6)),
+                                FavoriteMemory = reader.IsDBNull(7) ? "" : reader.GetString(7),
+                                ImportantDetails = reader.IsDBNull(8) ? "" : reader.GetString(8),
+                                Notes = reader.IsDBNull(9) ? "" : reader.GetString(9),
+                                IsFavorite = reader.GetInt32(10) == 1,
+                                EmergencyContact = reader.IsDBNull(11) ? "No" : reader.GetString(11)
+                            });
+                        }
+                    }
                 }
             }
+
+            return people;
         }
 
-        public void DeleteRoutine(int id)
+        public static void SavePerson(Person person, int userId)
         {
-            string query = "DELETE FROM Routines WHERE Id = @Id";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (var conn = GetConnection())
             {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
+                conn.Open();
+
+                if (person.Id == 0)
                 {
-                    command.Parameters.AddWithValue("@Id", id);
-                    command.ExecuteNonQuery();
+                    // Insert new person
+                    string insert = @"INSERT INTO People (UserId, Name, Relationship, PhoneNumber, Email, Address,
+                                     Birthday, FavoriteMemory, ImportantDetails, Notes, IsFavorite, EmergencyContact)
+                                     VALUES (@userId, @name, @relationship, @phone, @email, @address,
+                                     @birthday, @favoriteMemory, @importantDetails, @notes, @isFavorite, @emergencyContact)";
+
+                    using (var cmd = new SQLiteCommand(insert, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@userId", userId);
+                        cmd.Parameters.AddWithValue("@name", person.Name);
+                        cmd.Parameters.AddWithValue("@relationship", person.Relationship ?? "");
+                        cmd.Parameters.AddWithValue("@phone", person.PhoneNumber ?? "");
+                        cmd.Parameters.AddWithValue("@email", person.Email ?? "");
+                        cmd.Parameters.AddWithValue("@address", person.Address ?? "");
+                        cmd.Parameters.AddWithValue("@birthday", person.Birthday.HasValue ? person.Birthday.Value.ToString("yyyy-MM-dd") : (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@favoriteMemory", person.FavoriteMemory ?? "");
+                        cmd.Parameters.AddWithValue("@importantDetails", person.ImportantDetails ?? "");
+                        cmd.Parameters.AddWithValue("@notes", person.Notes ?? "");
+                        cmd.Parameters.AddWithValue("@isFavorite", person.IsFavorite ? 1 : 0);
+                        cmd.Parameters.AddWithValue("@emergencyContact", person.EmergencyContact ?? "No");
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                else
+                {
+                    // Update existing person
+                    string update = @"UPDATE People
+                                     SET Name = @name, Relationship = @relationship, PhoneNumber = @phone,
+                                     Email = @email, Address = @address, Birthday = @birthday,
+                                     FavoriteMemory = @favoriteMemory, ImportantDetails = @importantDetails,
+                                     Notes = @notes, IsFavorite = @isFavorite, EmergencyContact = @emergencyContact
+                                     WHERE Id = @id AND UserId = @userId";
+
+                    using (var cmd = new SQLiteCommand(update, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", person.Id);
+                        cmd.Parameters.AddWithValue("@userId", userId);
+                        cmd.Parameters.AddWithValue("@name", person.Name);
+                        cmd.Parameters.AddWithValue("@relationship", person.Relationship ?? "");
+                        cmd.Parameters.AddWithValue("@phone", person.PhoneNumber ?? "");
+                        cmd.Parameters.AddWithValue("@email", person.Email ?? "");
+                        cmd.Parameters.AddWithValue("@address", person.Address ?? "");
+                        cmd.Parameters.AddWithValue("@birthday", person.Birthday.HasValue ? person.Birthday.Value.ToString("yyyy-MM-dd") : (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@favoriteMemory", person.FavoriteMemory ?? "");
+                        cmd.Parameters.AddWithValue("@importantDetails", person.ImportantDetails ?? "");
+                        cmd.Parameters.AddWithValue("@notes", person.Notes ?? "");
+                        cmd.Parameters.AddWithValue("@isFavorite", person.IsFavorite ? 1 : 0);
+                        cmd.Parameters.AddWithValue("@emergencyContact", person.EmergencyContact ?? "No");
+                        cmd.ExecuteNonQuery();
+                    }
                 }
             }
         }
 
-        public List<Routine> GetAllRoutines()
+        public static void DeletePerson(int personId, int userId)
+        {
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                string delete = "DELETE FROM People WHERE Id = @id AND UserId = @userId";
+
+                using (var cmd = new SQLiteCommand(delete, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", personId);
+                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // ==================== ROUTINE METHODS ====================
+
+        public static List<Routine> GetUserRoutines(int userId)
         {
             List<Routine> routines = new List<Routine>();
-            string query = "SELECT * FROM Routines ORDER BY StartTime";
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (var conn = GetConnection())
             {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
-                using (SqlDataReader reader = command.ExecuteReader())
+                conn.Open();
+                string query = @"SELECT Id, Name, Description, StartTime, Category, IsActive
+                                FROM Routines WHERE UserId = @userId";
+
+                using (var cmd = new SQLiteCommand(query, conn))
                 {
-                    while (reader.Read())
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        Routine routine = new Routine
+                        while (reader.Read())
                         {
-                            Id = reader.GetInt32(0),
-                            Name = reader.GetString(1),
-                            Description = reader.IsDBNull(2) ? "" : reader.GetString(2),
-                            StartTime = reader.GetTimeSpan(3),
-                            IsActive = reader.GetBoolean(4),
-                            Category = reader.IsDBNull(5) ? "" : reader.GetString(5),
-                            CreatedDate = reader.GetDateTime(6),
-                            IconName = reader.IsDBNull(7) ? "" : reader.GetString(7)
-                        };
+                            var routine = new Routine
+                            {
+                                Id = reader.GetInt32(0),
+                                Name = reader.GetString(1),
+                                Description = reader.IsDBNull(2) ? "" : reader.GetString(2),
+                                StartTime = TimeSpan.Parse(reader.GetString(3)),
+                                Category = reader.IsDBNull(4) ? "" : reader.GetString(4),
+                                IsActive = reader.GetInt32(5) == 1,
+                                Steps = new List<RoutineStep>()
+                            };
 
-                        routines.Add(routine);
+                            // Load steps for this routine
+                            routine.Steps = GetRoutineSteps(conn, routine.Id);
+                            routines.Add(routine);
+                        }
                     }
-                }
-
-                // Load steps for each routine
-                foreach (var routine in routines)
-                {
-                    routine.Steps = GetRoutineSteps(routine.Id, connection);
                 }
             }
 
             return routines;
         }
 
-        private List<RoutineStep> GetRoutineSteps(int routineId, SqlConnection connection)
+        private static List<RoutineStep> GetRoutineSteps(SQLiteConnection conn, int routineId)
         {
             List<RoutineStep> steps = new List<RoutineStep>();
-            string query = "SELECT * FROM RoutineSteps WHERE RoutineId = @RoutineId ORDER BY StepNumber";
 
-            using (SqlCommand command = new SqlCommand(query, connection))
+            string query = @"SELECT StepNumber, Instruction, DurationMinutes
+                            FROM RoutineSteps WHERE RoutineId = @routineId ORDER BY StepNumber";
+
+            using (var cmd = new SQLiteCommand(query, conn))
             {
-                command.Parameters.AddWithValue("@RoutineId", routineId);
-                using (SqlDataReader reader = command.ExecuteReader())
+                cmd.Parameters.AddWithValue("@routineId", routineId);
+
+                using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
                         steps.Add(new RoutineStep
                         {
-                            StepNumber = reader.GetInt32(2),
-                            Instruction = reader.GetString(3),
-                            DurationMinutes = reader.GetInt32(4),
-                            IsCompleted = reader.GetBoolean(5),
-                            ImagePath = reader.IsDBNull(6) ? "" : reader.GetString(6)
+                            StepNumber = reader.GetInt32(0),
+                            Instruction = reader.GetString(1),
+                            DurationMinutes = reader.GetInt32(2)
                         });
                     }
                 }
@@ -607,18 +678,126 @@ namespace Yaadein.Data
             return steps;
         }
 
-        #endregion
-
-        public void ClearAllData()
+        public static void SaveRoutine(Routine routine, int userId)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (var conn = GetConnection())
             {
-                connection.Open();
-                ExecuteNonQuery("DELETE FROM RoutineSteps", connection);
-                ExecuteNonQuery("DELETE FROM Routines", connection);
-                ExecuteNonQuery("DELETE FROM Reminders", connection);
-                ExecuteNonQuery("DELETE FROM People", connection);
-                ExecuteNonQuery("DELETE FROM MemoryCards", connection);
+                conn.Open();
+
+                using (var transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        if (routine.Id == 0)
+                        {
+                            // Insert new routine
+                            string insert = @"INSERT INTO Routines (UserId, Name, Description, StartTime, Category, IsActive)
+                                             VALUES (@userId, @name, @description, @startTime, @category, @isActive);
+                                             SELECT last_insert_rowid();";
+
+                            using (var cmd = new SQLiteCommand(insert, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@userId", userId);
+                                cmd.Parameters.AddWithValue("@name", routine.Name);
+                                cmd.Parameters.AddWithValue("@description", routine.Description ?? "");
+                                cmd.Parameters.AddWithValue("@startTime", routine.StartTime.ToString());
+                                cmd.Parameters.AddWithValue("@category", routine.Category ?? "");
+                                cmd.Parameters.AddWithValue("@isActive", routine.IsActive ? 1 : 0);
+
+                                routine.Id = Convert.ToInt32(cmd.ExecuteScalar());
+                            }
+                        }
+                        else
+                        {
+                            // Update existing routine
+                            string update = @"UPDATE Routines
+                                             SET Name = @name, Description = @description, StartTime = @startTime,
+                                             Category = @category, IsActive = @isActive
+                                             WHERE Id = @id AND UserId = @userId";
+
+                            using (var cmd = new SQLiteCommand(update, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@id", routine.Id);
+                                cmd.Parameters.AddWithValue("@userId", userId);
+                                cmd.Parameters.AddWithValue("@name", routine.Name);
+                                cmd.Parameters.AddWithValue("@description", routine.Description ?? "");
+                                cmd.Parameters.AddWithValue("@startTime", routine.StartTime.ToString());
+                                cmd.Parameters.AddWithValue("@category", routine.Category ?? "");
+                                cmd.Parameters.AddWithValue("@isActive", routine.IsActive ? 1 : 0);
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            // Delete existing steps
+                            string deleteSteps = "DELETE FROM RoutineSteps WHERE RoutineId = @routineId";
+                            using (var cmd = new SQLiteCommand(deleteSteps, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@routineId", routine.Id);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        // Insert steps
+                        foreach (var step in routine.Steps)
+                        {
+                            string insertStep = @"INSERT INTO RoutineSteps (RoutineId, StepNumber, Instruction, DurationMinutes)
+                                                 VALUES (@routineId, @stepNumber, @instruction, @duration)";
+
+                            using (var cmd = new SQLiteCommand(insertStep, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@routineId", routine.Id);
+                                cmd.Parameters.AddWithValue("@stepNumber", step.StepNumber);
+                                cmd.Parameters.AddWithValue("@instruction", step.Instruction);
+                                cmd.Parameters.AddWithValue("@duration", step.DurationMinutes);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public static void DeleteRoutine(int routineId, int userId)
+        {
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+
+                using (var transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Delete steps first
+                        string deleteSteps = "DELETE FROM RoutineSteps WHERE RoutineId = @routineId";
+                        using (var cmd = new SQLiteCommand(deleteSteps, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@routineId", routineId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Delete routine
+                        string deleteRoutine = "DELETE FROM Routines WHERE Id = @id AND UserId = @userId";
+                        using (var cmd = new SQLiteCommand(deleteRoutine, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@id", routineId);
+                            cmd.Parameters.AddWithValue("@userId", userId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
             }
         }
     }

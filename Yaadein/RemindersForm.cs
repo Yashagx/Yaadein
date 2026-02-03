@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Yaadein.Models;
+using Yaadein.Data;
 
 namespace Yaadein
 {
@@ -22,7 +23,7 @@ namespace Yaadein
         private void RemindersForm_Load(object sender, EventArgs e)
         {
             InitializeForm();
-            LoadSampleData();
+            LoadUserReminders();
             LoadRemindersList();
             ClearForm();
         }
@@ -50,76 +51,17 @@ namespace Yaadein
             cmbRecurrence.Enabled = false;
         }
 
-        private void LoadSampleData()
+        private void LoadUserReminders()
         {
-            reminders.Add(new Reminder
+            try
             {
-                Id = 1,
-                Title = "Take Morning Medication",
-                Description = "Take blood pressure medicine with breakfast",
-                ReminderTime = DateTime.Today.AddHours(8).AddMinutes(30),
-                IsRecurring = true,
-                Recurrence = RecurrenceType.Daily,
-                Category = ReminderCategories.Medication,
-                Priority = "1",
-                IsActive = true,
-                IsCompleted = false
-            });
-
-            reminders.Add(new Reminder
+                reminders = DatabaseHelper.GetUserReminders(DatabaseHelper.CurrentUserId);
+            }
+            catch (Exception ex)
             {
-                Id = 2,
-                Title = "Lunch Time",
-                Description = "Have a healthy lunch",
-                ReminderTime = DateTime.Today.AddHours(12).AddMinutes(30),
-                IsRecurring = true,
-                Recurrence = RecurrenceType.Daily,
-                Category = ReminderCategories.Meal,
-                Priority = "2",
-                IsActive = true,
-                IsCompleted = false
-            });
-
-            reminders.Add(new Reminder
-            {
-                Id = 3,
-                Title = "Afternoon Walk",
-                Description = "30-minute walk in the park",
-                ReminderTime = DateTime.Today.AddHours(15).AddMinutes(0),
-                IsRecurring = true,
-                Recurrence = RecurrenceType.Daily,
-                Category = ReminderCategories.Exercise,
-                Priority = "2",
-                IsActive = true,
-                IsCompleted = false
-            });
-
-            reminders.Add(new Reminder
-            {
-                Id = 4,
-                Title = "Evening Medication",
-                Description = "Take evening medicines before dinner",
-                ReminderTime = DateTime.Today.AddHours(18).AddMinutes(0),
-                IsRecurring = true,
-                Recurrence = RecurrenceType.Daily,
-                Category = ReminderCategories.Medication,
-                Priority = "1",
-                IsActive = true,
-                IsCompleted = false
-            });
-
-            reminders.Add(new Reminder
-            {
-                Id = 5,
-                Title = "Call Daughter",
-                Description = "Video call with Sarah",
-                ReminderTime = DateTime.Today.AddHours(19).AddMinutes(0),
-                IsRecurring = false,
-                Category = ReminderCategories.Social,
-                Priority = "2",
-                IsActive = true,
-                IsCompleted = false
-            });
+                MessageBox.Show($"Error loading reminders: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadRemindersList()
@@ -133,10 +75,7 @@ namespace Yaadein
 
             foreach (var reminder in activeReminders)
             {
-                int priorityNum = 2;
-                int.TryParse(reminder.Priority, out priorityNum);
-
-                string priority = priorityNum == 1 ? "🔴" : priorityNum == 2 ? "🟡" : "🟢";
+                string priority = reminder.Priority == 1 ? "🔴" : reminder.Priority == 2 ? "🟡" : "🟢";
                 string time = reminder.ReminderTime.ToString("MM/dd hh:mm tt");
                 string displayText = $"{priority} {time} - {reminder.Title}";
                 lstReminders.Items.Add(displayText);
@@ -189,11 +128,21 @@ namespace Yaadein
 
             if (result == DialogResult.Yes)
             {
-                reminders.Remove(currentReminder);
-                LoadRemindersList();
-                ClearForm();
-                MessageBox.Show("Reminder deleted successfully!", "Deleted",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                try
+                {
+                    DatabaseHelper.DeleteReminder(currentReminder.Id, DatabaseHelper.CurrentUserId);
+                    reminders.Remove(currentReminder);
+                    LoadRemindersList();
+                    ClearForm();
+
+                    MessageBox.Show("Reminder deleted successfully!", "Deleted",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error deleting reminder: {ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -202,45 +151,54 @@ namespace Yaadein
             if (!ValidateForm())
                 return;
 
-            if (isEditMode)
+            try
             {
-                currentReminder.Title = txtTitle.Text.Trim();
-                currentReminder.Description = txtDescription.Text.Trim();
-                currentReminder.ReminderTime = dtpDate.Value.Date.Add(dtpTime.Value.TimeOfDay);
-                currentReminder.IsRecurring = chkRecurring.Checked;
-                currentReminder.Recurrence = GetRecurrenceType();
-                currentReminder.Category = cmbCategory.SelectedItem.ToString();
-                currentReminder.Priority = ((int)numPriority.Value).ToString();
-
-                MessageBox.Show("Reminder updated successfully!", "Updated",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                int newId = reminders.Count > 0 ? reminders.Max(r => r.Id) + 1 : 1;
-
-                var newReminder = new Reminder
+                if (isEditMode)
                 {
-                    Id = newId,
-                    Title = txtTitle.Text.Trim(),
-                    Description = txtDescription.Text.Trim(),
-                    ReminderTime = dtpDate.Value.Date.Add(dtpTime.Value.TimeOfDay),
-                    IsRecurring = chkRecurring.Checked,
-                    Recurrence = GetRecurrenceType(),
-                    Category = cmbCategory.SelectedItem.ToString(),
-                    Priority = ((int)numPriority.Value).ToString(),
-                    IsActive = true,
-                    IsCompleted = false
-                };
+                    currentReminder.Title = txtTitle.Text.Trim();
+                    currentReminder.Description = txtDescription.Text.Trim();
+                    currentReminder.ReminderTime = dtpDate.Value.Date.Add(dtpTime.Value.TimeOfDay);
+                    currentReminder.IsRecurring = chkRecurring.Checked;
+                    currentReminder.Recurrence = GetRecurrenceType();
+                    currentReminder.Category = cmbCategory.SelectedItem.ToString();
+                    currentReminder.Priority = (int)numPriority.Value;
 
-                reminders.Add(newReminder);
+                    DatabaseHelper.SaveReminder(currentReminder, DatabaseHelper.CurrentUserId);
 
-                MessageBox.Show("Reminder added successfully!", "Added",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Reminder updated successfully!", "Updated",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    var newReminder = new Reminder
+                    {
+                        Id = 0,
+                        Title = txtTitle.Text.Trim(),
+                        Description = txtDescription.Text.Trim(),
+                        ReminderTime = dtpDate.Value.Date.Add(dtpTime.Value.TimeOfDay),
+                        IsRecurring = chkRecurring.Checked,
+                        Recurrence = GetRecurrenceType(),
+                        Category = cmbCategory.SelectedItem.ToString(),
+                        Priority = (int)numPriority.Value,
+                        IsActive = true,
+                        IsCompleted = false
+                    };
+
+                    DatabaseHelper.SaveReminder(newReminder, DatabaseHelper.CurrentUserId);
+                    LoadUserReminders();
+
+                    MessageBox.Show("Reminder added successfully!", "Added",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                LoadRemindersList();
+                ClearForm();
             }
-
-            LoadRemindersList();
-            ClearForm();
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving reminder: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -278,12 +236,7 @@ namespace Yaadein
             dtpTime.Value = reminder.ReminderTime;
             chkRecurring.Checked = reminder.IsRecurring;
             cmbCategory.SelectedItem = reminder.Category;
-
-            int priorityValue;
-            if (int.TryParse(reminder.Priority, out priorityValue))
-            {
-                numPriority.Value = priorityValue;
-            }
+            numPriority.Value = reminder.Priority;
 
             if (reminder.IsRecurring)
             {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Yaadein.Models;
 using Yaadein.Services;
+using Yaadein.Data;
 
 namespace Yaadein
 {
@@ -24,83 +25,22 @@ namespace Yaadein
 
         private void PeopleForm_Load(object sender, EventArgs e)
         {
-            LoadSamplePeople();
+            LoadUserPeople();
             LoadPeopleList();
             ClearForm();
         }
 
-        private void LoadSamplePeople()
+        private void LoadUserPeople()
         {
-            people.Add(new Person
+            try
             {
-                Id = 1,
-                Name = "Sarah Johnson",
-                Relationship = "Daughter",
-                PhoneNumber = "(555) 123-4567",
-                Email = "sarah.johnson@email.com",
-                Address = "123 Oak Street, Springfield",
-                Birthday = new DateTime(1985, 6, 15),
-                FavoriteMemory = "Our trip to the beach last summer where we collected seashells together.",
-                ImportantDetails = "Loves gardening and cooking. Works as a teacher. Has two children - Emily and Jake.",
-                IsFavorite = true,
-                EmergencyContact = "Yes"
-            });
-
-            people.Add(new Person
+                people = DatabaseHelper.GetUserPeople(DatabaseHelper.CurrentUserId);
+            }
+            catch (Exception ex)
             {
-                Id = 2,
-                Name = "Dr. Michael Roberts",
-                Relationship = "Family Doctor",
-                PhoneNumber = "(555) 987-6543",
-                Email = "dr.roberts@cityhospital.com",
-                Address = "City Hospital, 456 Medical Plaza",
-                ImportantDetails = "Primary care physician for 15 years. Specializes in geriatric care. Very patient and understanding.",
-                IsFavorite = false,
-                EmergencyContact = "Yes"
-            });
-
-            people.Add(new Person
-            {
-                Id = 3,
-                Name = "Robert Martinez",
-                Relationship = "Son",
-                PhoneNumber = "(555) 234-5678",
-                Email = "robert.m@email.com",
-                Address = "789 Maple Avenue, Riverside",
-                Birthday = new DateTime(1988, 3, 22),
-                FavoriteMemory = "Teaching him to ride a bike in the park. He fell many times but never gave up!",
-                ImportantDetails = "Works in IT. Loves technology and fixing computers. Married to Lisa. Visits every Sunday.",
-                IsFavorite = true,
-                EmergencyContact = "No"
-            });
-
-            people.Add(new Person
-            {
-                Id = 4,
-                Name = "Margaret Thompson",
-                Relationship = "Best Friend",
-                PhoneNumber = "(555) 345-6789",
-                Email = "maggie.t@email.com",
-                Address = "321 Pine Street, Springfield",
-                Birthday = new DateTime(1952, 11, 8),
-                FavoriteMemory = "Weekly coffee meetups at the Corner Cafe for over 20 years. We've shared so many laughs!",
-                ImportantDetails = "Known each other since college. Loves knitting and book clubs. Has three cats.",
-                IsFavorite = true,
-                EmergencyContact = "No"
-            });
-
-            people.Add(new Person
-            {
-                Id = 5,
-                Name = "Jennifer Lee",
-                Relationship = "Caregiver",
-                PhoneNumber = "(555) 456-7890",
-                Email = "jennifer.lee@careservices.com",
-                Address = "Home Care Services, 567 Health Way",
-                ImportantDetails = "Professional caregiver. Comes Monday, Wednesday, and Friday. Very gentle and helpful with daily tasks.",
-                IsFavorite = false,
-                EmergencyContact = "Yes"
-            });
+                MessageBox.Show($"Error loading people: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadPeopleList()
@@ -164,11 +104,21 @@ namespace Yaadein
 
             if (result == DialogResult.Yes)
             {
-                people.Remove(currentPerson);
-                LoadPeopleList();
-                ClearForm();
-                MessageBox.Show("Person removed successfully!", "Deleted",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                try
+                {
+                    DatabaseHelper.DeletePerson(currentPerson.Id, DatabaseHelper.CurrentUserId);
+                    people.Remove(currentPerson);
+                    LoadPeopleList();
+                    ClearForm();
+
+                    MessageBox.Show("Person removed successfully!", "Deleted",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error deleting person: {ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -177,26 +127,38 @@ namespace Yaadein
             if (!ValidateForm())
                 return;
 
-            if (isEditMode)
+            try
             {
-                UpdatePersonFromForm(currentPerson);
-                MessageBox.Show($"{currentPerson.Name} updated successfully!", "Success",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                Person newPerson = new Person
+                if (isEditMode)
                 {
-                    Id = people.Count > 0 ? people.Max(p => p.Id) + 1 : 1
-                };
-                UpdatePersonFromForm(newPerson);
-                people.Add(newPerson);
-                MessageBox.Show($"{newPerson.Name} added successfully!", "Success",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+                    UpdatePersonFromForm(currentPerson);
+                    DatabaseHelper.SavePerson(currentPerson, DatabaseHelper.CurrentUserId);
 
-            LoadPeopleList();
-            ClearForm();
+                    MessageBox.Show($"{currentPerson.Name} updated successfully!", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    Person newPerson = new Person
+                    {
+                        Id = 0
+                    };
+                    UpdatePersonFromForm(newPerson);
+                    DatabaseHelper.SavePerson(newPerson, DatabaseHelper.CurrentUserId);
+                    LoadUserPeople();
+
+                    MessageBox.Show($"{newPerson.Name} added successfully!", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                LoadPeopleList();
+                ClearForm();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving person: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void UpdatePersonFromForm(Person person)

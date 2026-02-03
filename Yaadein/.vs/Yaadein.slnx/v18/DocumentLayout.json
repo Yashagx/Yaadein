@@ -3,16 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\yaadein\\services\\groqservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:services\\groqservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\yaadein\\peopleform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:peopleform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\yaadein\\registerform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:registerform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\yaadein\\remindersform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:remindersform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\yaadein\\data\\databasehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:data\\databasehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\yaadein\\maindashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:maindashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\yaadein\\routinesform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:routinesform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\maindashboard.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:maindashboard.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,45 +34,84 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "RoutinesForm.cs",
-              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\RoutinesForm.cs",
-              "RelativeDocumentMoniker": "RoutinesForm.cs",
-              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\RoutinesForm.cs",
-              "RelativeToolTip": "RoutinesForm.cs",
-              "ViewState": "AgIAAH8BAAAAAAAAAAAcwL0BAAABAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "DatabaseHelper.cs",
+              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\Data\\DatabaseHelper.cs",
+              "RelativeDocumentMoniker": "Data\\DatabaseHelper.cs",
+              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\Data\\DatabaseHelper.cs",
+              "RelativeToolTip": "Data\\DatabaseHelper.cs",
+              "ViewState": "AgIAAOgCAAAAAAAAAAAiwCMDAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-01T15:39:50.667Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "GroqService.cs",
-              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\Services\\GroqService.cs",
-              "RelativeDocumentMoniker": "Services\\GroqService.cs",
-              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\Services\\GroqService.cs",
-              "RelativeToolTip": "Services\\GroqService.cs",
-              "ViewState": "AgIAAGIAAAAAAAAAAAAwwIMAAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-01T15:38:47.297Z",
+              "WhenOpened": "2026-02-03T12:31:43.362Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "MainDashboard.Designer.cs",
-              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\MainDashboard.Designer.cs",
-              "RelativeDocumentMoniker": "MainDashboard.Designer.cs",
-              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\MainDashboard.Designer.cs",
-              "RelativeToolTip": "MainDashboard.Designer.cs",
-              "ViewState": "AgIAAAkBAAAAAAAAAAAwwEYBAAABAAAAAAAAAA==",
+              "Title": "RemindersForm.cs",
+              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\RemindersForm.cs",
+              "RelativeDocumentMoniker": "RemindersForm.cs",
+              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\RemindersForm.cs",
+              "RelativeToolTip": "RemindersForm.cs",
+              "ViewState": "AgIAAP0AAAAAAAAAAAAIwGsBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-01T14:52:23.847Z",
+              "WhenOpened": "2026-02-03T12:25:53.984Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "RegisterForm.cs",
+              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\RegisterForm.cs",
+              "RelativeDocumentMoniker": "RegisterForm.cs",
+              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\RegisterForm.cs",
+              "RelativeToolTip": "RegisterForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-03T12:15:53.166Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PeopleForm.cs",
+              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\PeopleForm.cs",
+              "RelativeDocumentMoniker": "PeopleForm.cs",
+              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\PeopleForm.cs",
+              "RelativeToolTip": "PeopleForm.cs",
+              "ViewState": "AgIAADABAAAAAAAAAAAiwEwBAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-03T12:15:40.683Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainDashboard.cs",
+              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\MainDashboard.cs",
+              "RelativeDocumentMoniker": "MainDashboard.cs",
+              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\MainDashboard.cs",
+              "RelativeToolTip": "MainDashboard.cs",
+              "ViewState": "AgIAAKUAAAAAAAAAAAAiwOAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-03T12:15:27.132Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "RoutinesForm.cs",
+              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\RoutinesForm.cs",
+              "RelativeDocumentMoniker": "RoutinesForm.cs",
+              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\Yaadein\\RoutinesForm.cs",
+              "RelativeToolTip": "RoutinesForm.cs",
+              "ViewState": "AgIAAGYBAAAAAAAAAAAiwKEBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-03T12:15:19.392Z",
               "EditorCaption": ""
             }
           ]

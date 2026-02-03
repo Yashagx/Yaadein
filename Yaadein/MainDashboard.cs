@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Yaadein.Models;
+using Yaadein.Data;
 
 namespace Yaadein
 {
@@ -26,97 +27,33 @@ namespace Yaadein
         {
             InitializeComponent();
             reminders = new List<Reminder>();
-            LoadSampleData();
         }
 
         private void MainDashboard_Load(object sender, EventArgs e)
         {
-            // Set initial time and date
             UpdateClock();
 
-            // Set random motivational quote
             Random rand = new Random();
             lblMotivation.Text = motivationalQuotes[rand.Next(motivationalQuotes.Length)];
 
-            // Load upcoming reminders
+            LoadUserReminders();
             LoadUpcomingReminders();
 
-            // Start timers
             timerClock.Start();
             timerReminder.Start();
         }
 
-        private void LoadSampleData()
+        private void LoadUserReminders()
         {
-            // Add some sample reminders for demonstration
-            reminders.Add(new Reminder
+            try
             {
-                Id = 1,
-                Title = "Take Morning Medication",
-                Description = "Take blood pressure medicine with breakfast",
-                ReminderTime = DateTime.Today.AddHours(8).AddMinutes(30),
-                IsRecurring = true,
-                Recurrence = RecurrenceType.Daily,
-                Category = "Medication",
-                Priority = "1",
-                IsActive = true,
-                IsCompleted = false  // FIXED: Added missing property initialization
-            });
-
-            reminders.Add(new Reminder
+                reminders = DatabaseHelper.GetUserReminders(DatabaseHelper.CurrentUserId);
+            }
+            catch (Exception ex)
             {
-                Id = 2,
-                Title = "Lunch Time",
-                Description = "Have a healthy lunch",
-                ReminderTime = DateTime.Today.AddHours(12).AddMinutes(30),
-                IsRecurring = true,
-                Recurrence = RecurrenceType.Daily,
-                Category = "Meal",
-                Priority = "2",
-                IsActive = true,
-                IsCompleted = false  // FIXED: Added missing property initialization
-            });
-
-            reminders.Add(new Reminder
-            {
-                Id = 3,
-                Title = "Afternoon Walk",
-                Description = "30-minute walk in the park",
-                ReminderTime = DateTime.Today.AddHours(15).AddMinutes(0),
-                IsRecurring = true,
-                Recurrence = RecurrenceType.Daily,
-                Category = "Exercise",
-                Priority = "2",
-                IsActive = true,
-                IsCompleted = false  // FIXED: Added missing property initialization
-            });
-
-            reminders.Add(new Reminder
-            {
-                Id = 4,
-                Title = "Evening Medication",
-                Description = "Take evening medicines before dinner",
-                ReminderTime = DateTime.Today.AddHours(18).AddMinutes(0),
-                IsRecurring = true,
-                Recurrence = RecurrenceType.Daily,
-                Category = "Medication",
-                Priority = "1",
-                IsActive = true,
-                IsCompleted = false  // FIXED: Added missing property initialization
-            });
-
-            reminders.Add(new Reminder
-            {
-                Id = 5,
-                Title = "Call Daughter",
-                Description = "Video call with Sarah",
-                ReminderTime = DateTime.Today.AddHours(19).AddMinutes(0),
-                IsRecurring = false,
-                Category = "Social",
-                Priority = "2",
-                IsActive = true,
-                IsCompleted = false  // FIXED: Added missing property initialization
-            });
+                MessageBox.Show($"Error loading reminders: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadUpcomingReminders()
@@ -138,10 +75,7 @@ namespace Yaadein
             {
                 foreach (var reminder in upcoming)
                 {
-                    int priorityNum = 2;
-                    int.TryParse(reminder.Priority, out priorityNum);
-
-                    string priority = priorityNum == 1 ? "🔴" : priorityNum == 2 ? "🟡" : "🟢";
+                    string priority = reminder.Priority == 1 ? "🔴" : reminder.Priority == 2 ? "🟡" : "🟢";
                     string time = reminder.ReminderTime.ToString("hh:mm tt");
                     string displayText = $"{priority} {time} - {reminder.Title}";
 
@@ -178,6 +112,15 @@ namespace Yaadein
             {
                 ShowReminderNotification(reminder);
                 reminder.IsCompleted = true;
+
+                try
+                {
+                    DatabaseHelper.SaveReminder(reminder, DatabaseHelper.CurrentUserId);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error updating reminder: {ex.Message}");
+                }
             }
         }
 
@@ -189,7 +132,6 @@ namespace Yaadein
             MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        // Navigation Button Events
         private void btnReminders_Click(object sender, EventArgs e)
         {
             ResetButtonColors();
@@ -200,8 +142,9 @@ namespace Yaadein
             RemindersForm remindersForm = new RemindersForm();
             remindersForm.ShowDialog();
 
-            // Refresh after returning
-            LoadUpcomingReminders();  // FIXED: Added reload of upcoming reminders after dialog closes
+            LoadUserReminders();
+            LoadUpcomingReminders();
+
             btnReminders.BackColor = Color.Transparent;
             btnReminders.ForeColor = Color.FromArgb(100, 100, 100);
             btnReminders.Font = new Font("Segoe UI", 14, FontStyle.Regular);
@@ -220,7 +163,6 @@ namespace Yaadein
             PeopleForm peopleForm = new PeopleForm();
             peopleForm.ShowDialog();
 
-            // Refresh after returning
             btnPeople.BackColor = Color.Transparent;
             btnPeople.ForeColor = Color.FromArgb(100, 100, 100);
             btnPeople.Font = new Font("Segoe UI", 14, FontStyle.Regular);
@@ -239,7 +181,6 @@ namespace Yaadein
             RoutinesForm routinesForm = new RoutinesForm();
             routinesForm.ShowDialog();
 
-            // Refresh after returning
             btnRoutines.BackColor = Color.Transparent;
             btnRoutines.ForeColor = Color.FromArgb(100, 100, 100);
             btnRoutines.Font = new Font("Segoe UI", 14, FontStyle.Regular);
@@ -264,7 +205,6 @@ namespace Yaadein
 
         private void ResetButtonColors()
         {
-            // Reset all navigation buttons to default state
             btnDashboard.BackColor = Color.Transparent;
             btnDashboard.ForeColor = Color.FromArgb(100, 100, 100);
             btnDashboard.Font = new Font("Segoe UI", 14, FontStyle.Regular);

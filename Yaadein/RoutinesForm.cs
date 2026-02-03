@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Yaadein.Models;
 using Yaadein.Services;
+using Yaadein.Data;
 
 namespace Yaadein
 {
@@ -25,7 +26,7 @@ namespace Yaadein
         private void RoutinesForm_Load(object sender, EventArgs e)
         {
             InitializeForm();
-            LoadSampleRoutines();
+            LoadUserRoutines();
             LoadRoutinesList();
             ClearForm();
         }
@@ -42,68 +43,17 @@ namespace Yaadein
             btnSave.Enabled = false;
         }
 
-        private void LoadSampleRoutines()
+        private void LoadUserRoutines()
         {
-            var morningRoutine = new Routine
+            try
             {
-                Id = 1,
-                Name = "Morning Routine",
-                Description = "Daily morning activities",
-                StartTime = new TimeSpan(7, 0, 0),
-                Category = RoutineCategories.Morning,
-                IsActive = true
-            };
-            morningRoutine.Steps.Add(new RoutineStep { StepNumber = 1, Instruction = "Wake up and stretch for 2 minutes", DurationMinutes = 2 });
-            morningRoutine.Steps.Add(new RoutineStep { StepNumber = 2, Instruction = "Brush teeth and wash face", DurationMinutes = 10 });
-            morningRoutine.Steps.Add(new RoutineStep { StepNumber = 3, Instruction = "Get dressed for the day", DurationMinutes = 10 });
-            morningRoutine.Steps.Add(new RoutineStep { StepNumber = 4, Instruction = "Eat a healthy breakfast", DurationMinutes = 20 });
-            morningRoutine.Steps.Add(new RoutineStep { StepNumber = 5, Instruction = "Take morning medication", DurationMinutes = 5 });
-            routines.Add(morningRoutine);
-
-            var medicationRoutine = new Routine
+                routines = DatabaseHelper.GetUserRoutines(DatabaseHelper.CurrentUserId);
+            }
+            catch (Exception ex)
             {
-                Id = 2,
-                Name = "Medication Schedule",
-                Description = "Daily medication routine",
-                StartTime = new TimeSpan(8, 30, 0),
-                Category = RoutineCategories.Medication,
-                IsActive = true
-            };
-            medicationRoutine.Steps.Add(new RoutineStep { StepNumber = 1, Instruction = "Take blood pressure medication with water", DurationMinutes = 2 });
-            medicationRoutine.Steps.Add(new RoutineStep { StepNumber = 2, Instruction = "Take vitamin supplements", DurationMinutes = 2 });
-            medicationRoutine.Steps.Add(new RoutineStep { StepNumber = 3, Instruction = "Record medication in log book", DurationMinutes = 3 });
-            routines.Add(medicationRoutine);
-
-            var exerciseRoutine = new Routine
-            {
-                Id = 3,
-                Name = "Light Exercise",
-                Description = "Daily physical activity",
-                StartTime = new TimeSpan(15, 0, 0),
-                Category = RoutineCategories.Exercise,
-                IsActive = true
-            };
-            exerciseRoutine.Steps.Add(new RoutineStep { StepNumber = 1, Instruction = "Put on comfortable walking shoes", DurationMinutes = 3 });
-            exerciseRoutine.Steps.Add(new RoutineStep { StepNumber = 2, Instruction = "Walk around the neighborhood", DurationMinutes = 20 });
-            exerciseRoutine.Steps.Add(new RoutineStep { StepNumber = 3, Instruction = "Do light stretching exercises", DurationMinutes = 10 });
-            exerciseRoutine.Steps.Add(new RoutineStep { StepNumber = 4, Instruction = "Drink water and rest", DurationMinutes = 5 });
-            routines.Add(exerciseRoutine);
-
-            var eveningRoutine = new Routine
-            {
-                Id = 4,
-                Name = "Evening Wind Down",
-                Description = "Prepare for bedtime",
-                StartTime = new TimeSpan(20, 0, 0),
-                Category = RoutineCategories.Evening,
-                IsActive = true
-            };
-            eveningRoutine.Steps.Add(new RoutineStep { StepNumber = 1, Instruction = "Have a light dinner", DurationMinutes = 30 });
-            eveningRoutine.Steps.Add(new RoutineStep { StepNumber = 2, Instruction = "Take evening medication", DurationMinutes = 5 });
-            eveningRoutine.Steps.Add(new RoutineStep { StepNumber = 3, Instruction = "Brush teeth and wash up", DurationMinutes = 15 });
-            eveningRoutine.Steps.Add(new RoutineStep { StepNumber = 4, Instruction = "Read or listen to calming music", DurationMinutes = 20 });
-            eveningRoutine.Steps.Add(new RoutineStep { StepNumber = 5, Instruction = "Go to bed", DurationMinutes = 0 });
-            routines.Add(eveningRoutine);
+                MessageBox.Show($"Error loading routines: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadRoutinesList()
@@ -132,15 +82,15 @@ namespace Yaadein
         {
             switch (category)
             {
-                case RoutineCategories.Morning: return "🌅";
-                case RoutineCategories.Afternoon: return "☀️";
-                case RoutineCategories.Evening: return "🌆";
-                case RoutineCategories.Night: return "🌙";
-                case RoutineCategories.Medication: return "💊";
-                case RoutineCategories.Exercise: return "🏃";
-                case RoutineCategories.Meal: return "🍽️";
-                case RoutineCategories.Personal: return "🧼";
-                case RoutineCategories.Social: return "👥";
+                case "Morning Routine": return "🌅";
+                case "Afternoon Routine": return "☀️";
+                case "Evening Routine": return "🌆";
+                case "Night Routine": return "🌙";
+                case "Medication Routine": return "💊";
+                case "Exercise Routine": return "🏃";
+                case "Meal Routine": return "🍽️";
+                case "Personal Care": return "🧼";
+                case "Social Activity": return "👥";
                 default: return "📋";
             }
         }
@@ -186,11 +136,21 @@ namespace Yaadein
 
             if (result == DialogResult.Yes)
             {
-                routines.Remove(currentRoutine);
-                LoadRoutinesList();
-                ClearForm();
-                MessageBox.Show("Routine deleted successfully!", "Deleted",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                try
+                {
+                    DatabaseHelper.DeleteRoutine(currentRoutine.Id, DatabaseHelper.CurrentUserId);
+                    routines.Remove(currentRoutine);
+                    LoadRoutinesList();
+                    ClearForm();
+
+                    MessageBox.Show("Routine deleted successfully!", "Deleted",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error deleting routine: {ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -199,26 +159,37 @@ namespace Yaadein
             if (!ValidateForm())
                 return;
 
-            if (isEditMode)
+            try
             {
-                UpdateRoutineFromForm(currentRoutine);
-                MessageBox.Show("Routine updated successfully!", "Success",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                Routine newRoutine = new Routine
+                if (isEditMode)
                 {
-                    Id = routines.Count > 0 ? routines.Max(r => r.Id) + 1 : 1
-                };
-                UpdateRoutineFromForm(newRoutine);
-                routines.Add(newRoutine);
-                MessageBox.Show("Routine added successfully!", "Success",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+                    UpdateRoutineFromForm(currentRoutine);
+                    DatabaseHelper.SaveRoutine(currentRoutine, DatabaseHelper.CurrentUserId);
+                    MessageBox.Show("Routine updated successfully!", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    Routine newRoutine = new Routine
+                    {
+                        Id = 0,
+                        Steps = new List<RoutineStep>()
+                    };
+                    UpdateRoutineFromForm(newRoutine);
+                    DatabaseHelper.SaveRoutine(newRoutine, DatabaseHelper.CurrentUserId);
+                    LoadUserRoutines();
+                    MessageBox.Show("Routine added successfully!", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
 
-            LoadRoutinesList();
-            ClearForm();
+                LoadRoutinesList();
+                ClearForm();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving routine: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void UpdateRoutineFromForm(Routine routine)
@@ -230,11 +201,12 @@ namespace Yaadein
             routine.IsActive = chkActive.Checked;
 
             routine.Steps.Clear();
-            foreach (ListViewItem item in lstSteps.Items)
+            for (int i = 0; i < lstSteps.Items.Count; i++)
             {
+                ListViewItem item = lstSteps.Items[i];
                 routine.Steps.Add(new RoutineStep
                 {
-                    StepNumber = int.Parse(item.SubItems[0].Text),
+                    StepNumber = i + 1,
                     Instruction = item.SubItems[1].Text,
                     DurationMinutes = int.Parse(item.SubItems[2].Text.Replace(" min", ""))
                 });
@@ -300,7 +272,7 @@ namespace Yaadein
 
                 MessageBox.Show(
                     aiResponse,
-                    $"💡 AI Suggestions for {routineType} Routine",
+                    $"💡 AI Suggestions for {routineType}",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
             }

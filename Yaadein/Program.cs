@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Windows.Forms;
+using Yaadein.Data;
 
 namespace Yaadein
 {
     static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainDashboard());
+
+            // Initialize database - errors will be shown automatically
+            DatabaseHelper.InitializeDatabase();
+
+            Application.Run(new LoginForm());
         }
     }
 }

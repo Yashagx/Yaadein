@@ -1,143 +1,144 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Yaadein.Services
 {
-    /// <summary>
-    /// Service for AI-powered memory recall using Groq API
-    /// </summary>
     public class GroqService
     {
-        private readonly string apiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY");
+        private readonly string apiKey;
         private readonly string apiUrl = "https://api.groq.com/openai/v1/chat/completions";
         private readonly HttpClient httpClient;
 
         public GroqService()
         {
+            apiKey = ConfigurationManager.AppSettings["GroqApiKey"] ?? "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";
             httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
             httpClient.Timeout = TimeSpan.FromSeconds(30);
         }
 
-        /// <summary>
-        /// Generate a personalized memory recall message for a person
-        /// </summary>
         public async Task<string> RecallPersonInfoAsync(string name, string relationship, string details)
         {
             try
             {
                 var requestBody = new
                 {
-                    model = "llama-3.3-70b-versatile",
+                    model = "mixtral-8x7b-32768",
                     messages = new[]
                     {
-                        new
-                        {
-                            role = "system",
-                            content = "You are a compassionate memory assistant helping an Alzheimer's patient remember people in their life. Provide warm, gentle reminders about the person in 2-3 sentences. Focus on positive memories and important details. Keep it simple and reassuring."
-                        },
-                        new
-                        {
-                            role = "user",
-                            content = $"Help me remember: {name} is my {relationship}. Important details: {details}"
-                        }
+                        new { role = "system", content = "You are a warm, caring companion for someone with memory challenges. Speak naturally and kindly, as if you're their trusted friend. Keep responses brief (2-3 sentences) and comforting." },
+                        new { role = "user", content = $"Help me remember: {name} is my {relationship}. Details: {details}" }
                     },
-                    temperature = 0.7,
+                    temperature = 0.8,
                     max_tokens = 150
                 };
 
                 string jsonContent = JsonConvert.SerializeObject(requestBody);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
                 var response = await httpClient.PostAsync(apiUrl, content);
-                response.EnsureSuccessStatusCode();
-
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<ChatCompletionResponse>(responseBody);
-
                 return result.Choices[0].Message.Content;
             }
-            catch (HttpRequestException)
+            catch
             {
-                return $"💭 {name} is your {relationship}. They are someone special in your life who cares about you deeply.";
-            }
-            catch (TaskCanceledException)
-            {
-                return $"💭 {name} is your {relationship}. They are someone special in your life who cares about you deeply.";
-            }
-            catch (Exception)
-            {
-                return $"💭 {name} is your {relationship}. They are someone special in your life who cares about you deeply.";
+                return $"💭 {name} is your {relationship}. They care deeply about you and are always there for you.";
             }
         }
 
-        /// <summary>
-        /// Generate suggestions for daily routines
-        /// </summary>
-        public async Task<string> SuggestRoutineAsync(string routineType, string userPreferences)
+        public async Task<EmotionalAnalysis> AnalyzeEmotionAsync(string text)
         {
             try
             {
                 var requestBody = new
                 {
-                    model = "llama-3.3-70b-versatile",
+                    model = "mixtral-8x7b-32768",
                     messages = new[]
                     {
-                        new
-                        {
-                            role = "system",
-                            content = "You are a helpful assistant for Alzheimer's patients. Suggest simple, easy-to-follow routine steps. Keep instructions clear, brief, and encouraging."
-                        },
-                        new
-                        {
-                            role = "user",
-                            content = $"Suggest a {routineType} routine for someone with memory challenges. Preferences: {userPreferences}. Provide 4-6 simple steps."
-                        }
+                        new { role = "system", content = "Analyze the emotional tone of text. Respond ONLY with JSON: {\"emotion\":\"happy/sad/anxious/calm/frustrated/content\",\"intensity\":1-10,\"context\":\"brief explanation\"}" },
+                        new { role = "user", content = text }
                     },
-                    temperature = 0.7,
+                    temperature = 0.3,
+                    max_tokens = 100
+                };
+
+                string jsonContent = JsonConvert.SerializeObject(requestBody);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                var response = await httpClient.PostAsync(apiUrl, content);
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ChatCompletionResponse>(responseBody);
+
+                string cleaned = result.Choices[0].Message.Content.Replace("```json", "").Replace("```", "").Trim();
+                return JsonConvert.DeserializeObject<EmotionalAnalysis>(cleaned);
+            }
+            catch
+            {
+                return new EmotionalAnalysis { Emotion = "neutral", Intensity = 5, Context = "Unable to analyze" };
+            }
+        }
+
+        public async Task<string> GenerateEmpatheticResponseAsync(string userMessage, string emotionalState)
+        {
+            try
+            {
+                var requestBody = new
+                {
+                    model = "mixtral-8x7b-32768",
+                    messages = new[]
+                    {
+                        new { role = "system", content = $"You are a compassionate AI companion. The person is feeling {emotionalState}. Respond with warmth and understanding. Be conversational, not robotic. Keep it brief and natural." },
+                        new { role = "user", content = userMessage }
+                    },
+                    temperature = 0.9,
                     max_tokens = 200
                 };
 
                 string jsonContent = JsonConvert.SerializeObject(requestBody);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
                 var response = await httpClient.PostAsync(apiUrl, content);
-                response.EnsureSuccessStatusCode();
-
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<ChatCompletionResponse>(responseBody);
-
                 return result.Choices[0].Message.Content;
             }
-            catch (HttpRequestException)
+            catch
             {
-                return "Unable to generate suggestions at this time. Please try again later.";
-            }
-            catch (TaskCanceledException)
-            {
-                return "Request timed out. Please check your internet connection and try again.";
-            }
-            catch (Exception)
-            {
-                return "Unable to generate suggestions at this time. Please try again later.";
+                return "I'm here with you. How can I help you feel better right now?";
             }
         }
 
-        /// <summary>
-        /// Clean up resources
-        /// </summary>
-        public void Dispose()
+        public async Task<string> SuggestRoutineAsync(string routineType, string preferences)
         {
-            httpClient?.Dispose();
-        }
+            try
+            {
+                var requestBody = new
+                {
+                    model = "mixtral-8x7b-32768",
+                    messages = new[]
+                    {
+                        new { role = "system", content = "Suggest simple, gentle routine steps for someone with memory challenges. Be encouraging and clear. Provide 4-6 steps." },
+                        new { role = "user", content = $"Create a {routineType} routine. Preferences: {preferences}" }
+                    },
+                    temperature = 0.7,
+                    max_tokens = 300
+                };
 
-        // -----------------------------------------------------------
-        // Strongly-typed response models (replaces 'dynamic')
-        // -----------------------------------------------------------
+                string jsonContent = JsonConvert.SerializeObject(requestBody);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                var response = await httpClient.PostAsync(apiUrl, content);
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ChatCompletionResponse>(responseBody);
+                return result.Choices[0].Message.Content;
+            }
+            catch
+            {
+                return "I'd love to help you create a routine, but I'm having trouble right now. Let's try again in a moment.";
+            }
+        }
 
         private class ChatCompletionResponse
         {
@@ -156,5 +157,17 @@ namespace Yaadein.Services
             [JsonProperty("content")]
             public string Content { get; set; }
         }
+    }
+
+    public class EmotionalAnalysis
+    {
+        [JsonProperty("emotion")]
+        public string Emotion { get; set; }
+
+        [JsonProperty("intensity")]
+        public int Intensity { get; set; }
+
+        [JsonProperty("context")]
+        public string Context { get; set; }
     }
 }
