@@ -84,6 +84,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompanionChatForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Data\DatabaseHelper.cs" />
     <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>

@@ -20,6 +20,7 @@
             this.components = new System.ComponentModel.Container();
             this.panelSidebar = new System.Windows.Forms.Panel();
             this.btnExit = new System.Windows.Forms.Button();
+            this.btnCompanion = new System.Windows.Forms.Button();
             this.btnRoutines = new System.Windows.Forms.Button();
             this.btnPeople = new System.Windows.Forms.Button();
             this.btnReminders = new System.Windows.Forms.Button();
@@ -47,6 +48,7 @@
             // 
             this.panelSidebar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(240)))), ((int)(((byte)(245)))));
             this.panelSidebar.Controls.Add(this.btnExit);
+            this.panelSidebar.Controls.Add(this.btnCompanion);
             this.panelSidebar.Controls.Add(this.btnRoutines);
             this.panelSidebar.Controls.Add(this.btnPeople);
             this.panelSidebar.Controls.Add(this.btnReminders);
@@ -70,11 +72,29 @@
             this.btnExit.Name = "btnExit";
             this.btnExit.Padding = new System.Windows.Forms.Padding(25, 0, 0, 0);
             this.btnExit.Size = new System.Drawing.Size(250, 60);
-            this.btnExit.TabIndex = 5;
+            this.btnExit.TabIndex = 6;
             this.btnExit.Text = "❌  Exit";
             this.btnExit.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnExit.UseVisualStyleBackColor = false;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            // 
+            // btnCompanion
+            // 
+            this.btnCompanion.BackColor = System.Drawing.Color.Transparent;
+            this.btnCompanion.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCompanion.FlatAppearance.BorderSize = 0;
+            this.btnCompanion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCompanion.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCompanion.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
+            this.btnCompanion.Location = new System.Drawing.Point(0, 370);
+            this.btnCompanion.Name = "btnCompanion";
+            this.btnCompanion.Padding = new System.Windows.Forms.Padding(25, 0, 0, 0);
+            this.btnCompanion.Size = new System.Drawing.Size(250, 60);
+            this.btnCompanion.TabIndex = 5;
+            this.btnCompanion.Text = "🤖  Companion Chat";
+            this.btnCompanion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCompanion.UseVisualStyleBackColor = false;
+            this.btnCompanion.Click += new System.EventHandler(this.btnCompanion_Click);
             // 
             // btnRoutines
             // 
@@ -311,6 +331,7 @@
         private System.Windows.Forms.Button btnReminders;
         private System.Windows.Forms.Button btnPeople;
         private System.Windows.Forms.Button btnRoutines;
+        private System.Windows.Forms.Button btnCompanion;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Panel panelHeader;
         private System.Windows.Forms.Label lblWelcome;

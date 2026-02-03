@@ -189,6 +189,24 @@ namespace Yaadein
             btnDashboard.Font = new Font("Segoe UI", 14, FontStyle.Bold);
         }
 
+        private void btnCompanion_Click(object sender, EventArgs e)
+        {
+            ResetButtonColors();
+            btnCompanion.BackColor = Color.FromArgb(255, 192, 203);
+            btnCompanion.ForeColor = Color.White;
+            btnCompanion.Font = new Font("Segoe UI", 14, FontStyle.Bold);
+
+            CompanionChatForm companionChatForm = new CompanionChatForm();
+            companionChatForm.ShowDialog();
+
+            btnCompanion.BackColor = Color.Transparent;
+            btnCompanion.ForeColor = Color.FromArgb(100, 100, 100);
+            btnCompanion.Font = new Font("Segoe UI", 14, FontStyle.Regular);
+            btnDashboard.BackColor = Color.FromArgb(255, 192, 203);
+            btnDashboard.ForeColor = Color.White;
+            btnDashboard.Font = new Font("Segoe UI", 14, FontStyle.Bold);
+        }
+
         private void btnExit_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
@@ -220,6 +238,10 @@ namespace Yaadein
             btnRoutines.BackColor = Color.Transparent;
             btnRoutines.ForeColor = Color.FromArgb(100, 100, 100);
             btnRoutines.Font = new Font("Segoe UI", 14, FontStyle.Regular);
+
+            btnCompanion.BackColor = Color.Transparent;
+            btnCompanion.ForeColor = Color.FromArgb(100, 100, 100);
+            btnCompanion.Font = new Font("Segoe UI", 14, FontStyle.Regular);
         }
     }
 }

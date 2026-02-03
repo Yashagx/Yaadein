@@ -800,5 +800,85 @@ namespace Yaadein.Data
                 }
             }
         }
+
+        // Emotional State Logging for AI Companion
+        public static void LogEmotionalState(int userId, string emotion, int intensity, string context, DateTime timestamp)
+        {
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+
+                string query = @"INSERT INTO EmotionalInsights 
+                                (UserId, EmotionType, IntensityLevel, TriggerContext, RecordedDate)
+                                VALUES (@userId, @emotion, @intensity, @context, @timestamp)";
+
+                using (var cmd = new SQLiteCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.Parameters.AddWithValue("@emotion", emotion);
+                    cmd.Parameters.AddWithValue("@intensity", intensity);
+                    cmd.Parameters.AddWithValue("@context", context ?? "");
+                    cmd.Parameters.AddWithValue("@timestamp", timestamp.ToString("yyyy-MM-dd HH:mm:ss"));
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static List<EmotionalLog> GetEmotionalLogs(int userId, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            List<EmotionalLog> logs = new List<EmotionalLog>();
+
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+
+                string query = @"SELECT Id, EmotionType, IntensityLevel, TriggerContext, RecordedDate
+                                FROM EmotionalInsights 
+                                WHERE UserId = @userId";
+
+                if (startDate.HasValue)
+                    query += " AND RecordedDate >= @startDate";
+                if (endDate.HasValue)
+                    query += " AND RecordedDate <= @endDate";
+
+                query += " ORDER BY RecordedDate DESC LIMIT 100";
+
+                using (var cmd = new SQLiteCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+                    if (startDate.HasValue)
+                        cmd.Parameters.AddWithValue("@startDate", startDate.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                    if (endDate.HasValue)
+                        cmd.Parameters.AddWithValue("@endDate", endDate.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            logs.Add(new EmotionalLog
+                            {
+                                Id = reader.GetInt32(0),
+                                Emotion = reader.GetString(1),
+                                Intensity = reader.GetInt32(2),
+                                Context = reader.IsDBNull(3) ? "" : reader.GetString(3),
+                                Timestamp = DateTime.Parse(reader.GetString(4))
+                            });
+                        }
+                    }
+                }
+            }
+
+            return logs;
+        }
+    }
+
+    // Emotional Log Model
+    public class EmotionalLog
+    {
+        public int Id { get; set; }
+        public string Emotion { get; set; }
+        public int Intensity { get; set; }
+        public string Context { get; set; }
+        public DateTime Timestamp { get; set; }
     }
 }
