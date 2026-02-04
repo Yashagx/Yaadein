@@ -3,36 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\vpp\\yaadein\\companionchatform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:companionchatform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\vpp\\yaadein\\loginform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:loginform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\vpp\\yaadein\\maindashboard.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:maindashboard.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\maindashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:maindashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\data\\databasehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:data\\databasehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\vpp\\yaadein\\peopleform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:peopleform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\registerform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:registerform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\remindersform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:remindersform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\routinesform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:routinesform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|c:\\users\\win11\\onedrive\\desktop\\vpp\\yaadein\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Yaadein.csproj|solutionrelative:loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -42,112 +18,37 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "MainDashboard.Designer.cs",
-              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\MainDashboard.Designer.cs",
-              "RelativeDocumentMoniker": "MainDashboard.Designer.cs",
-              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\MainDashboard.Designer.cs",
-              "RelativeToolTip": "MainDashboard.Designer.cs",
-              "ViewState": "AgIAADQBAAAAAAAAAAAqwE0BAAA5AAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "LoginForm.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\LoginForm.Designer.cs",
+              "RelativeDocumentMoniker": "LoginForm.Designer.cs",
+              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\LoginForm.Designer.cs",
+              "RelativeToolTip": "LoginForm.Designer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-03T13:21:28.419Z",
+              "WhenOpened": "2026-02-04T13:23:05.009Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LoginForm.cs",
+              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\LoginForm.cs",
+              "RelativeDocumentMoniker": "LoginForm.cs",
+              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\LoginForm.cs",
+              "RelativeToolTip": "LoginForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T13:22:58.703Z",
               "EditorCaption": ""
             },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "CompanionChatForm.cs",
-              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\CompanionChatForm.cs",
-              "RelativeDocumentMoniker": "CompanionChatForm.cs",
-              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\CompanionChatForm.cs",
-              "RelativeToolTip": "CompanionChatForm.cs",
-              "ViewState": "AgIAAPYAAAAAAAAAAAAqwCMBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-03T13:15:59.603Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "DatabaseHelper.cs",
-              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\Data\\DatabaseHelper.cs",
-              "RelativeDocumentMoniker": "Data\\DatabaseHelper.cs",
-              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\Data\\DatabaseHelper.cs",
-              "RelativeToolTip": "Data\\DatabaseHelper.cs",
-              "ViewState": "AgIAADQDAAAAAAAAAAAqwHMDAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-03T12:31:43.362Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "RemindersForm.cs",
-              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\RemindersForm.cs",
-              "RelativeDocumentMoniker": "RemindersForm.cs",
-              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\RemindersForm.cs",
-              "RelativeToolTip": "RemindersForm.cs",
-              "ViewState": "AgIAAP0AAAAAAAAAAAAIwGsBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-03T12:25:53.984Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "RegisterForm.cs",
-              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\RegisterForm.cs",
-              "RelativeDocumentMoniker": "RegisterForm.cs",
-              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\RegisterForm.cs",
-              "RelativeToolTip": "RegisterForm.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-03T12:15:53.166Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "PeopleForm.cs",
-              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\PeopleForm.cs",
-              "RelativeDocumentMoniker": "PeopleForm.cs",
-              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\PeopleForm.cs",
-              "RelativeToolTip": "PeopleForm.cs",
-              "ViewState": "AgIAADABAAAAAAAAAAAiwEwBAAAtAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-03T12:15:40.683Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "MainDashboard.cs",
-              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\MainDashboard.cs",
-              "RelativeDocumentMoniker": "MainDashboard.cs",
-              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\MainDashboard.cs",
-              "RelativeToolTip": "MainDashboard.cs",
-              "ViewState": "AgIAALcAAAAAAAAAAAAqwPYAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-03T12:15:27.132Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "RoutinesForm.cs",
-              "DocumentMoniker": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\RoutinesForm.cs",
-              "RelativeDocumentMoniker": "RoutinesForm.cs",
-              "ToolTip": "C:\\Users\\Win11\\OneDrive\\Desktop\\VPP\\Yaadein\\RoutinesForm.cs",
-              "RelativeToolTip": "RoutinesForm.cs",
-              "ViewState": "AgIAAGYBAAAAAAAAAAAiwKEBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-03T12:15:19.392Z"
             }
           ]
         }

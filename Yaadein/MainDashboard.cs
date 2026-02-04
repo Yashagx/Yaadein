@@ -207,6 +207,24 @@ namespace Yaadein
             btnDashboard.Font = new Font("Segoe UI", 14, FontStyle.Bold);
         }
 
+        private void btnMoodLog_Click(object sender, EventArgs e)
+        {
+            ResetButtonColors();
+            btnMoodLog.BackColor = Color.FromArgb(255, 192, 203);
+            btnMoodLog.ForeColor = Color.White;
+            btnMoodLog.Font = new Font("Segoe UI", 14, FontStyle.Bold);
+
+            MoodLogForm moodLogForm = new MoodLogForm();
+            moodLogForm.ShowDialog();
+
+            btnMoodLog.BackColor = Color.Transparent;
+            btnMoodLog.ForeColor = Color.FromArgb(100, 100, 100);
+            btnMoodLog.Font = new Font("Segoe UI", 14, FontStyle.Regular);
+            btnDashboard.BackColor = Color.FromArgb(255, 192, 203);
+            btnDashboard.ForeColor = Color.White;
+            btnDashboard.Font = new Font("Segoe UI", 14, FontStyle.Bold);
+        }
+
         private void btnExit_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
@@ -242,6 +260,10 @@ namespace Yaadein
             btnCompanion.BackColor = Color.Transparent;
             btnCompanion.ForeColor = Color.FromArgb(100, 100, 100);
             btnCompanion.Font = new Font("Segoe UI", 14, FontStyle.Regular);
+
+            btnMoodLog.BackColor = Color.Transparent;
+            btnMoodLog.ForeColor = Color.FromArgb(100, 100, 100);
+            btnMoodLog.Font = new Font("Segoe UI", 14, FontStyle.Regular);
         }
     }
 }

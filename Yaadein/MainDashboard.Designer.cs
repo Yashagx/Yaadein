@@ -20,6 +20,7 @@
             this.components = new System.ComponentModel.Container();
             this.panelSidebar = new System.Windows.Forms.Panel();
             this.btnExit = new System.Windows.Forms.Button();
+            this.btnMoodLog = new System.Windows.Forms.Button();
             this.btnCompanion = new System.Windows.Forms.Button();
             this.btnRoutines = new System.Windows.Forms.Button();
             this.btnPeople = new System.Windows.Forms.Button();
@@ -48,6 +49,7 @@
             // 
             this.panelSidebar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(240)))), ((int)(((byte)(245)))));
             this.panelSidebar.Controls.Add(this.btnExit);
+            this.panelSidebar.Controls.Add(this.btnMoodLog);
             this.panelSidebar.Controls.Add(this.btnCompanion);
             this.panelSidebar.Controls.Add(this.btnRoutines);
             this.panelSidebar.Controls.Add(this.btnPeople);
@@ -72,11 +74,29 @@
             this.btnExit.Name = "btnExit";
             this.btnExit.Padding = new System.Windows.Forms.Padding(25, 0, 0, 0);
             this.btnExit.Size = new System.Drawing.Size(250, 60);
-            this.btnExit.TabIndex = 6;
+            this.btnExit.TabIndex = 7;
             this.btnExit.Text = "❌  Exit";
             this.btnExit.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnExit.UseVisualStyleBackColor = false;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            // 
+            // btnMoodLog
+            // 
+            this.btnMoodLog.BackColor = System.Drawing.Color.Transparent;
+            this.btnMoodLog.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMoodLog.FlatAppearance.BorderSize = 0;
+            this.btnMoodLog.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMoodLog.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnMoodLog.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
+            this.btnMoodLog.Location = new System.Drawing.Point(0, 430);
+            this.btnMoodLog.Name = "btnMoodLog";
+            this.btnMoodLog.Padding = new System.Windows.Forms.Padding(25, 0, 0, 0);
+            this.btnMoodLog.Size = new System.Drawing.Size(250, 60);
+            this.btnMoodLog.TabIndex = 6;
+            this.btnMoodLog.Text = "📊  Mood Log";
+            this.btnMoodLog.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnMoodLog.UseVisualStyleBackColor = false;
+            this.btnMoodLog.Click += new System.EventHandler(this.btnMoodLog_Click);
             // 
             // btnCompanion
             // 
@@ -145,7 +165,7 @@
             this.btnReminders.Padding = new System.Windows.Forms.Padding(25, 0, 0, 0);
             this.btnReminders.Size = new System.Drawing.Size(250, 60);
             this.btnReminders.TabIndex = 2;
-            this.btnReminders.Text = "⏰  Reminders";
+            this.btnReminders.Text = "🔔  Reminders";
             this.btnReminders.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnReminders.UseVisualStyleBackColor = false;
             this.btnReminders.Click += new System.EventHandler(this.btnReminders_Click);
@@ -170,11 +190,11 @@
             // lblAppTitle
             // 
             this.lblAppTitle.AutoSize = true;
-            this.lblAppTitle.Font = new System.Drawing.Font("Segoe UI", 28F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblAppTitle.Font = new System.Drawing.Font("Segoe UI", 22F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblAppTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(105)))), ((int)(((byte)(180)))));
-            this.lblAppTitle.Location = new System.Drawing.Point(30, 30);
+            this.lblAppTitle.Location = new System.Drawing.Point(30, 40);
             this.lblAppTitle.Name = "lblAppTitle";
-            this.lblAppTitle.Size = new System.Drawing.Size(168, 51);
+            this.lblAppTitle.Size = new System.Drawing.Size(140, 41);
             this.lblAppTitle.TabIndex = 0;
             this.lblAppTitle.Text = "Yaadein";
             // 
@@ -192,25 +212,27 @@
             // 
             // lblDate
             // 
-            this.lblDate.AutoSize = true;
-            this.lblDate.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblDate.Font = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDate.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
-            this.lblDate.Location = new System.Drawing.Point(640, 55);
+            this.lblDate.Location = new System.Drawing.Point(600, 60);
             this.lblDate.Name = "lblDate";
-            this.lblDate.Size = new System.Drawing.Size(243, 25);
+            this.lblDate.Size = new System.Drawing.Size(320, 25);
             this.lblDate.TabIndex = 2;
-            this.lblDate.Text = "Saturday, February 01, 2026";
+            this.lblDate.Text = "Monday, January 01, 2024";
+            this.lblDate.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // lblTime
             // 
-            this.lblTime.AutoSize = true;
-            this.lblTime.Font = new System.Drawing.Font("Segoe UI", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblTime.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTime.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(105)))), ((int)(((byte)(180)))));
-            this.lblTime.Location = new System.Drawing.Point(630, 15);
+            this.lblTime.Location = new System.Drawing.Point(700, 20);
             this.lblTime.Name = "lblTime";
-            this.lblTime.Size = new System.Drawing.Size(232, 65);
+            this.lblTime.Size = new System.Drawing.Size(220, 45);
             this.lblTime.TabIndex = 1;
             this.lblTime.Text = "12:00 PM";
+            this.lblTime.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // lblWelcome
             // 
@@ -332,6 +354,7 @@
         private System.Windows.Forms.Button btnPeople;
         private System.Windows.Forms.Button btnRoutines;
         private System.Windows.Forms.Button btnCompanion;
+        private System.Windows.Forms.Button btnMoodLog;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Panel panelHeader;
         private System.Windows.Forms.Label lblWelcome;
